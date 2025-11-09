@@ -1,0 +1,10 @@
+# Add these to your .env.local file
+
+# Cloudinary Configuration (Frontend)
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloud-name-here
+NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=your-upload-preset-name-here
+
+# Example:
+# NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=dxxxxx
+# NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=fast-connect-uploads
+
