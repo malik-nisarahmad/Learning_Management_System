@@ -69,25 +69,13 @@ export default function Page() {
             try {
               // Get user profile from backend
               const token = await firebaseUser.getIdToken();
-              const response = await fetch('http://localhost:3001/users/profile', {
-                method: 'GET',
-                headers: {
-                  'Authorization': `Bearer ${token}`,
-                },
-              });
-
-              let userData;
-              if (response.ok) {
-                userData = await response.json();
-              } else {
-                // Fallback if backend is not available
-                userData = {
-                  id: firebaseUser.uid,
-                  email: firebaseUser.email || '',
-                  username: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
-                  role: 'student',
-                };
-              }
+              // ✅ Skip backend entirely
+              const userData = {
+                id: firebaseUser.uid,
+                email: firebaseUser.email || '',
+                username: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
+                role: 'student',
+              };
 
               const user: User = {
                 id: userData.id || firebaseUser.uid,
@@ -122,23 +110,24 @@ export default function Page() {
 
   const handleLogin = (userData: User) => {
     setUser(userData);
+    localStorage.setItem('fastConnectUser', JSON.stringify(userData));
     setCurrentScreen('dashboard');
   };
 
   const handleLogout = async () => {
-    try {
-      // Sign out from Firebase
-      const { signOut } = await import('firebase/auth');
-      const { auth } = await import('@/lib/firebase');
-      if (auth) {
-        await signOut(auth);
-      }
-    } catch (err) {
-      console.error('Logout error:', err);
+  try {
+    const { signOut } = await import('firebase/auth');
+    const { auth } = await import('@/lib/firebase');
+    if (auth) {
+      await signOut(auth);
     }
-    setUser(null);
-    setCurrentScreen('landing');
-  };
+  } catch (err) {
+    console.error('Logout error:', err);
+  }
+  setUser(null);
+  localStorage.removeItem('fastConnectUser'); // ✅ clear
+  setCurrentScreen('landing');
+};
 
   const navigate = (screen: Screen) => {
     setCurrentScreen(screen);

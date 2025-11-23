@@ -1,3 +1,4 @@
+// FULL UPDATED FacultyContact.tsx
 import { useState } from 'react';
 import { Navigation } from './Navigation';
 import { Card } from './ui/card';
@@ -7,29 +8,11 @@ import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback } from './ui/avatar';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Clock,
-  Search,
-  Sparkles,
-  Send,
-  Copy,
-  RefreshCw
-} from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, Search, Sparkles, Send, Copy, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Screen, User } from '@/app/page';
-
-interface FacultyContactProps {
-  user: User;
-  onNavigate: (screen: Screen) => void;
-  onLogout: () => void;
-  darkMode: boolean;
-  toggleTheme: () => void;
-}
 
 interface FacultyMember {
   id: string;
@@ -43,7 +26,7 @@ interface FacultyMember {
   courses: string[];
 }
 
-export function FacultyContact({ user, onNavigate, onLogout, darkMode, toggleTheme }: FacultyContactProps) {
+export function FacultyContact({ user, onNavigate, onLogout, darkMode, toggleTheme }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('all');
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
@@ -53,88 +36,49 @@ export function FacultyContact({ user, onNavigate, onLogout, darkMode, toggleThe
   const [emailPurpose, setEmailPurpose] = useState('');
 
   const facultyMembers: FacultyMember[] = [
-    {
-      id: '1',
-      name: 'Dr. Muhammad Khan',
-      designation: 'Professor',
-      department: 'Computer Science',
-      email: 'muhammad.khan@nu.edu.pk',
-      phone: '+92 21 1234 5678',
-      office: 'Room 301, CS Building',
-      officeHours: 'Mon-Wed 2:00 PM - 4:00 PM',
-      courses: ['Data Structures', 'Algorithms']
-    },
-    {
-      id: '2',
-      name: 'Dr. Ayesha Ahmed',
-      designation: 'Associate Professor',
-      department: 'Computer Science',
-      email: 'ayesha.ahmed@nu.edu.pk',
-      phone: '+92 21 1234 5679',
-      office: 'Room 305, CS Building',
-      officeHours: 'Tue-Thu 3:00 PM - 5:00 PM',
-      courses: ['Database Systems', 'Web Development']
-    },
-    {
-      id: '3',
-      name: 'Prof. Ali Hassan',
-      designation: 'Professor',
-      department: 'Software Engineering',
-      email: 'ali.hassan@nu.edu.pk',
-      phone: '+92 21 1234 5680',
-      office: 'Room 210, SE Building',
-      officeHours: 'Mon-Fri 1:00 PM - 3:00 PM',
-      courses: ['Software Engineering', 'Requirements Engineering']
-    },
-    {
-      id: '4',
-      name: 'Dr. Fatima Malik',
-      designation: 'Assistant Professor',
-      department: 'Computer Science',
-      email: 'fatima.malik@nu.edu.pk',
-      phone: '+92 21 1234 5681',
-      office: 'Room 308, CS Building',
-      officeHours: 'Wed-Fri 10:00 AM - 12:00 PM',
-      courses: ['Operating Systems', 'Computer Networks']
-    },
-    {
-      id: '5',
-      name: 'Dr. Ahmed Raza',
-      designation: 'Assistant Professor',
-      department: 'Computer Science',
-      email: 'ahmed.raza@nu.edu.pk',
-      phone: '+92 21 1234 5682',
-      office: 'Room 312, CS Building',
-      officeHours: 'Mon-Wed 11:00 AM - 1:00 PM',
-      courses: ['Artificial Intelligence', 'Machine Learning']
-    },
-    {
-      id: '6',
-      name: 'Dr. Sara Ibrahim',
-      designation: 'Associate Professor',
-      department: 'Software Engineering',
-      email: 'sara.ibrahim@nu.edu.pk',
-      phone: '+92 21 1234 5683',
-      office: 'Room 215, SE Building',
-      officeHours: 'Tue-Thu 2:00 PM - 4:00 PM',
-      courses: ['Software Quality Assurance', 'Project Management']
-    }
+    // ---- AI & DS ----
+    { id: '1', name: 'Dr. Hasan Mujtaba', designation: 'Professor, Head of School', department: 'Artificial Intelligence & Data Science', email: 'hasan.mujtaba@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+    { id: '2', name: 'Dr. Ahmad Din', designation: 'Professor & HOD (AI&DS)', department: 'Artificial Intelligence & Data Science', email: 'ahmad.din@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+    { id: '3', name: 'Dr. Waseem Shahzad', designation: 'Professor & Director', department: 'Artificial Intelligence & Data Science', email: 'waseem.shahzad@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+    { id: '4', name: 'Dr. Muhammad Asif Naeem', designation: 'Professor & Director (ORIC)', department: 'Artificial Intelligence & Data Science', email: 'asif.naeem@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+    { id: '5', name: 'Dr. Mirza Omer Beg', designation: 'Professor (Adjunct)', department: 'Artificial Intelligence & Data Science', email: 'omer.beg@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+    { id: '6', name: 'Dr. Muhammad Ishtiaq', designation: 'Associate Professor', department: 'Artificial Intelligence & Data Science', email: 'ishtiaq@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+    { id: '7', name: 'Dr. Muhammad Mateen Yaqoob', designation: 'Assistant Professor', department: 'Artificial Intelligence & Data Science', email: 'mateen.yaqoob@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+    { id: '8', name: 'Dr. Muhammad Nouman Noor', designation: 'Assistant Professor', department: 'Artificial Intelligence & Data Science', email: 'nouman.noor@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+    { id: '9', name: 'Dr. Noshina Tariq', designation: 'Assistant Professor', department: 'Artificial Intelligence & Data Science', email: 'noshina.tariq@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+
+    // ---- CS ----
+    { id: '10', name: 'Dr. Muhammad Arshad Islam', designation: 'Professor & HOD (CS)', department: 'Computer Science', email: 'arshad.islam@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+    { id: '11', name: 'Dr. Hammad Majeed', designation: 'Professor & Director (IQAE)', department: 'Computer Science', email: 'hammad.majeed@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+    { id: '12', name: 'Dr. Akhtar Jamil', designation: 'Associate Professor', department: 'Computer Science', email: 'akhtar.jamil@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+    { id: '13', name: 'Dr. Ahmad Raza Shahid', designation: 'Professor', department: 'Computer Science', email: 'ahmad.shahid@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+    { id: '14', name: 'Dr. Danish Shehzad', designation: 'Associate Professor', department: 'Computer Science', email: 'danish.shehzad@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+    { id: '15', name: 'Dr. Ejaz Ahmed', designation: 'Associate Professor', department: 'Computer Science', email: 'ejaz.ahmed@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+    { id: '16', name: 'Dr. Labiba Fahad', designation: 'Associate Professor', department: 'Computer Science', email: 'labiba.fahad@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+
+    // ---- Cyber Security ----
+    { id: '17', name: 'Dr. Muhammad Qaisar Shafi', designation: 'Assistant Professor & Incharge (CY)', department: 'Cyber Security', email: 'qaisar.shafi@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+    { id: '18', name: 'Dr. Muhammad Asim', designation: 'Professor', department: 'Cyber Security', email: 'asim@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+    { id: '19', name: 'Dr. Zafar Iqbal Abbasi', designation: 'Associate Professor', department: 'Cyber Security', email: 'zafar.abbasi@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+    { id: '20', name: 'Dr. Subhan Ullah', designation: 'Associate Professor', department: 'Cyber Security', email: 'subhan.ullah@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+    { id: '21', name: 'Dr. Sana Aurangzeb', designation: 'Assistant Professor', department: 'Cyber Security', email: 'sana.aurangzeb@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+
+    // ---- Software Engineering ----
+    { id: '22', name: 'Dr. Usman Habib', designation: 'Professor & HOD (SE)', department: 'Software Engineering', email: 'usman.habib@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+    { id: '23', name: 'Dr. Naveed Ahmad', designation: 'Professor (Adjunct)', department: 'Software Engineering', email: 'naveed.ahmad@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
+    { id: '24', name: 'Dr. Atif Aftab Ahmed Jilani', designation: 'Assistant Professor', department: 'Software Engineering', email: 'atif.jilani@isb.edu.pk', phone: '', office: '', officeHours: '', courses: [] },
   ];
 
-  const departments = ['all', 'Computer Science', 'Software Engineering', 'Electrical Engineering'];
+  const departments = ['all', 'Artificial Intelligence & Data Science', 'Computer Science', 'Cyber Security', 'Software Engineering'];
 
   const filteredFaculty = facultyMembers.filter(faculty => {
-    const matchesSearch = faculty.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         faculty.courses.some(c => c.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesSearch = faculty.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesDepartment = selectedDepartment === 'all' || faculty.department === selectedDepartment;
     return matchesSearch && matchesDepartment;
   });
 
   const handleGenerateEmail = () => {
-    if (!emailPurpose) {
-      toast.error('Please select email purpose');
-      return;
-    }
+    if (!emailPurpose) return toast.error('Please select email purpose');
 
     let subject = '';
     let body = '';
@@ -142,31 +86,56 @@ export function FacultyContact({ user, onNavigate, onLogout, darkMode, toggleThe
     switch (emailPurpose) {
       case 'query':
         subject = 'Query Regarding Course Material';
-        body = `Dear ${selectedFaculty?.name},\n\nI hope this email finds you well. I am ${user.name}, a student in your ${selectedFaculty?.courses[0]} course.\n\nI have a query regarding [specific topic]. Could you please help me understand [your question]?\n\nThank you for your time and guidance.\n\nBest regards,\n${user.name}\n${user.fastId}`;
+        body = `Dear ${selectedFaculty?.name},
+
+I hope this email finds you well. I have a question regarding [topic].
+
+Regards,
+${user.name}`;
         break;
       case 'appointment':
         subject = 'Request for Appointment';
-        body = `Dear ${selectedFaculty?.name},\n\nI hope this email finds you well. I am ${user.name}, enrolled in your ${selectedFaculty?.courses[0]} course.\n\nI would like to schedule an appointment to discuss [topic/concern]. Would it be possible to meet during your office hours or at another convenient time?\n\nThank you for considering my request.\n\nBest regards,\n${user.name}\n${user.fastId}`;
+        body = `Dear ${selectedFaculty?.name},
+
+I would like to schedule an appointment regarding [topic].
+
+Regards,
+${user.name}`;
         break;
       case 'assignment':
-        subject = 'Query About Assignment Submission';
-        body = `Dear ${selectedFaculty?.name},\n\nI hope this email finds you well. I am ${user.name} from your ${selectedFaculty?.courses[0]} class.\n\nI have a question regarding the recent assignment. [Explain your query about the assignment].\n\nI would appreciate your guidance on this matter.\n\nThank you,\n${user.name}\n${user.fastId}`;
+        subject = 'Assignment Query';
+        body = `Dear ${selectedFaculty?.name},
+
+I have a question about the recent assignment: [details].
+
+Thank you,
+${user.name}`;
         break;
       case 'absence':
-        subject = 'Notification of Absence';
-        body = `Dear ${selectedFaculty?.name},\n\nI hope this email finds you well. I am ${user.name} from your ${selectedFaculty?.courses[0]} class.\n\nI am writing to inform you that I will be unable to attend class on [date] due to [reason]. I will ensure to catch up on the missed material.\n\nThank you for your understanding.\n\nBest regards,\n${user.name}\n${user.fastId}`;
+        subject = 'Absence Notification';
+        body = `Dear ${selectedFaculty?.name},
+
+I will be unable to attend class on [date] due to [reason].
+
+Regards,
+${user.name}`;
         break;
       default:
         subject = 'General Inquiry';
-        body = `Dear ${selectedFaculty?.name},\n\nI hope this email finds you well. I am ${user.name}, a student in the ${user.department} department.\n\n[Write your message here]\n\nThank you for your time.\n\nBest regards,\n${user.name}\n${user.fastId}`;
+        body = `Dear ${selectedFaculty?.name},
+
+[Write your message here]
+
+Regards,
+${user.name}`;
     }
 
     setEmailSubject(subject);
     setEmailBody(body);
-    toast.success('Email draft generated by AI!');
+    toast.success('Email draft generated');
   };
 
-  const handleCopyEmail = () => {
+  const handleCopyEmail= () => {
     navigator.clipboard.writeText(`Subject: ${emailSubject}\n\n${emailBody}`);
     toast.success('Email copied to clipboard!');
   };

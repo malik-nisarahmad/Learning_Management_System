@@ -1,5 +1,7 @@
 import { initializeApp, getApps } from 'firebase/app';
 import { getAuth, Auth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
 // Validate environment variables
 const requiredEnvVars = {
@@ -46,10 +48,12 @@ const firebaseConfig = {
   messagingSenderId: requiredEnvVars.messagingSenderId || '123456789',
   appId: requiredEnvVars.appId || '1:123456789:web:demo123'
 };
+// export const app=initializeApp(firebaseConfig);
 
 // Only initialize if we have a valid API key
 let app: ReturnType<typeof initializeApp> | undefined;
 let auth: Auth | null = null;
+ export const db = app ? getFirestore(app): undefined;
 
 if (cleanApiKey && cleanApiKey !== 'demo-api-key' && cleanApiKey.length > 20) {
   try {
@@ -80,5 +84,6 @@ if (cleanApiKey && cleanApiKey !== 'demo-api-key' && cleanApiKey.length > 20) {
 }
 
 export { auth };
+
 export default app;
 

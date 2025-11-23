@@ -391,4 +391,3 @@ export function RedditChat({ user, onNavigate, onLogout, darkMode, toggleTheme }
     </div>
   );
 }
-

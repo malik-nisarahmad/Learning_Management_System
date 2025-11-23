@@ -43,25 +43,13 @@ export function Login({ onLogin, onNavigate, darkMode, toggleTheme }: LoginProps
       
       // Get user profile from backend (for custom claims like role)
       const token = await firebaseUser.getIdToken();
-      const response = await fetch('http://localhost:3001/users/profile', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      let userData;
-      if (response.ok) {
-        userData = await response.json();
-      } else {
-        // Fallback if backend is not available
-        userData = {
-          id: firebaseUser.uid,
-          email: firebaseUser.email || '',
-          username: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
-          role: 'student',
-        };
-      }
+     // ✅ Skip backend entirely
+const userData = {
+  id: firebaseUser.uid,
+  email: firebaseUser.email || '',
+  username: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
+  role: 'student', // You can later use Firebase custom claims if needed
+};
 
       // Convert to frontend User type
       const user: User = {

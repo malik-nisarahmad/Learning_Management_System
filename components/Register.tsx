@@ -84,8 +84,12 @@ export function Register({ onRegister, onNavigate, darkMode, toggleTheme }: Regi
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            username: formData.name,
-            role: formData.role
+             username: formData.name,
+              email:  formData.email,
+              fastId: formData.fastId,
+              role:   formData.role,
+              department: formData.department,
+              semester: formData.role === 'student' ? 'Fall-2024' : undefined,
           }),
         });
       } catch (backendError) {

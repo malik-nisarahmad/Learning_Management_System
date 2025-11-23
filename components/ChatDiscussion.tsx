@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navigation } from './Navigation';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
@@ -7,10 +7,10 @@ import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { ScrollArea } from './ui/scroll-area';
-import { 
-  MessageSquare, 
-  Send, 
-  Users, 
+import {
+  MessageSquare,
+  Send,
+  Users,
   Hash,
   Plus,
   Sparkles,
@@ -18,25 +18,41 @@ import {
   MoreVertical,
   Pin,
   ThumbsUp,
-  MessageCircle
+  MessageCircle,
+  ArrowUp,
+  ArrowDown,
+  Reply,
+  Clock,
+  Bookmark,
+  Share2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Screen, User } from '@/app/page';
+import {
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  addDoc,
+  serverTimestamp,
+  Timestamp,
+  updateDoc,
+  doc,
+  increment,
+  setDoc,
+  getDocs,
+  where,
+  getDoc
+} from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
-interface ChatDiscussionProps {
-  user: User;
-  onNavigate: (screen: Screen) => void;
-  onLogout: () => void;
-  darkMode: boolean;
-  toggleTheme: () => void;
-}
-
+/* ---------- TYPES ---------- */
 interface Message {
   id: string;
   sender: string;
   avatar: string;
   content: string;
-  timestamp: string;
+  timestamp: Timestamp;
   isCurrentUser?: boolean;
 }
 
@@ -44,21 +60,56 @@ interface Thread {
   id: string;
   title: string;
   author: string;
+  authorAvatar: string;
   replies: number;
   likes: number;
   timestamp: string;
   category: string;
   isPinned?: boolean;
   lastReply: string;
+  createdAt: Timestamp;
 }
 
+interface RedditPost {
+  id: string;
+  title: string;
+  content: string;
+  author: string;
+  authorAvatar: string;
+  subreddit: string;
+  upvotes: number;
+  downvotes: number;
+  comments: number;
+  timestamp: string;
+  isUpvoted?: boolean;
+  isDownvoted?: boolean;
+  isSaved?: boolean;
+  createdAt: Timestamp;
+}
+
+interface RedditComment {
+  id: string;
+  author: string;
+  authorAvatar: string;
+  content: string;
+  upvotes: number;
+  downvotes: number;
+  timestamp: Timestamp;
+  isUpvoted?: boolean;
+  isDownvoted?: boolean;
+  parentId?: string;
+  postId: string;
+}
+
+/* ---------- COMPONENT ---------- */
 export function ChatDiscussion({ user, onNavigate, onLogout, darkMode, toggleTheme }: ChatDiscussionProps) {
-  const [selectedChat, setSelectedChat] = useState<string | null>('general');
+  const [selectedChat, setSelectedChat] = useState<string>('general');
   const [selectedThread, setSelectedThread] = useState<Thread | null>(null);
   const [message, setMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [showAIAssist, setShowAIAssist] = useState(false);
 
+  /* ---------- GROUP CHATS (STATIC) ---------- */
   const groupChats = [
     { id: 'general', name: 'General Discussion', members: 234, unread: 5 },
     { id: 'cs201', name: 'Data Structures - CS201', members: 89, unread: 12 },
@@ -67,101 +118,183 @@ export function ChatDiscussion({ user, onNavigate, onLogout, darkMode, toggleThe
     { id: 'studygroup', name: 'Study Group', members: 23, unread: 8 }
   ];
 
-  const threads: Thread[] = [
-    {
-      id: '1',
-      title: 'Best approach for implementing Binary Search Trees?',
-      author: 'Sarah Ahmed',
-      replies: 24,
-      likes: 15,
-      timestamp: '2 hours ago',
-      category: 'Data Structures',
-      isPinned: true,
-      lastReply: '30 min ago'
-    },
-    {
-      id: '2',
-      title: 'Help needed with Recursion assignment',
-      author: 'Ali Hassan',
-      replies: 18,
-      likes: 12,
-      timestamp: '5 hours ago',
-      category: 'Algorithms',
-      lastReply: '1 hour ago'
-    },
-    {
-      id: '3',
-      title: 'Database normalization explanation',
-      author: 'Fatima Khan',
-      replies: 32,
-      likes: 28,
-      timestamp: '1 day ago',
-      category: 'Databases',
-      lastReply: '3 hours ago'
-    },
-    {
-      id: '4',
-      title: 'Tips for Final Exam preparation',
-      author: 'Ahmed Raza',
-      replies: 45,
-      likes: 67,
-      timestamp: '2 days ago',
-      category: 'General',
-      isPinned: true,
-      lastReply: '5 hours ago'
-    }
-  ];
+  /* ---------- REAL-TIME CHAT ---------- */
+  const [messages, setMessages] = useState<Message[]>([]);
 
-  const messages: Message[] = [
-    {
-      id: '1',
-      sender: 'Sarah Ahmed',
-      avatar: 'SA',
-      content: 'Has anyone finished the Data Structures assignment?',
-      timestamp: '10:30 AM'
-    },
-    {
-      id: '2',
-      sender: 'Ali Hassan',
-      avatar: 'AH',
-      content: 'Yes! The BST implementation was tricky but I got it working.',
-      timestamp: '10:32 AM'
-    },
-    {
-      id: '3',
+  useEffect(() => {
+    if (!selectedChat || !db) return;
+    const q = query(
+      collection(db, 'chats', selectedChat, 'messages'),
+      orderBy('timestamp', 'asc')
+    );
+    const unsub = onSnapshot(q, (snap) => {
+      const msgs: Message[] = snap.docs.map((d) => ({
+        id: d.id,
+        ...d.data()
+      })) as Message[];
+      setMessages(msgs);
+    });
+    return () => unsub();
+  }, [selectedChat]);
+
+  const handleSendMessage = async () => {
+    if (!message.trim() || !selectedChat || !db) return;
+    await addDoc(collection(db, 'chats', selectedChat, 'messages'), {
       sender: user.name,
-      avatar: user.name.split(' ').map(n => n[0]).join(''),
-      content: 'Can you share your approach? I\'m stuck on the delete function.',
-      timestamp: '10:35 AM',
+      avatar: user.name.split(' ').map((n) => n[0]).join('').toUpperCase(),
+      content: message.trim(),
+      timestamp: serverTimestamp(),
       isCurrentUser: true
-    },
-    {
-      id: '4',
-      sender: 'Fatima Khan',
-      avatar: 'FK',
-      content: 'I can help! The key is to handle three cases: node with no children, one child, or two children.',
-      timestamp: '10:38 AM'
-    }
-  ];
-
-  const handleSendMessage = () => {
-    if (!message.trim()) return;
-    toast.success('Message sent!');
+    });
     setMessage('');
   };
 
-  const handleAIExplain = (content: string) => {
-    setShowAIAssist(true);
-    toast.info('AI is analyzing the discussion...');
-    setTimeout(() => {
-      toast.success('AI explanation generated!');
-    }, 1500);
+  /* ---------- REAL-TIME THREADS ---------- */
+  const [threads, setThreads] = useState<Thread[]>([]);
+
+  useEffect(() => {
+    if (!db) return;
+    const q = query(collection(db, 'threads'), orderBy('createdAt', 'desc'));
+    const unsub = onSnapshot(q, (snap) => {
+      const list: Thread[] = snap.docs.map((d) => ({
+        id: d.id,
+        ...d.data()
+      })) as Thread[];
+      setThreads(list);
+    });
+    return () => unsub();
+  }, []);
+
+  const handleCreateThread = async () => {
+    const title = prompt('Thread title:');
+    if (!title || !title.trim()) return;
+    const category = prompt('Category (General, Data Structures, etc.):') || 'General';
+    await addDoc(collection(db, 'threads'), {
+      title: title.trim(),
+      author: user.name,
+      authorAvatar: getInitials(user.name),
+      replies: 0,
+      likes: 0,
+      category,
+      isPinned: false,
+      lastReply: 'just now',
+      createdAt: serverTimestamp()
+    });
+    toast.success('Thread created!');
   };
 
-  const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  /* ---------- REAL-TIME POSTS (REDDIT STYLE) ---------- */
+  const [posts, setPosts] = useState<RedditPost[]>([]);
+  const [selectedPost, setSelectedPost] = useState<string | null>(null);
+  const [newComment, setNewComment] = useState('');
+  const [comments, setComments] = useState<RedditComment[]>([]);
+
+  useEffect(() => {
+    if (!db) return;
+    const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
+    const unsub = onSnapshot(q, (snap) => {
+      const list: RedditPost[] = snap.docs.map((d) => ({
+        id: d.id,
+        ...d.data()
+      })) as RedditPost[];
+      setPosts(list);
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    if (!selectedPost || !db) return;
+    const q = query(
+      collection(db, 'posts', selectedPost, 'comments'),
+      orderBy('timestamp', 'asc')
+    );
+    const unsub = onSnapshot(q, (snap) => {
+      const list: RedditComment[] = snap.docs.map((d) => ({
+        id: d.id,
+        ...d.data()
+      })) as RedditComment[];
+      setComments(list);
+    });
+    return () => unsub();
+  }, [selectedPost]);
+
+  const handleCreatePost = async () => {
+    const title = prompt('Post title:');
+    if (!title || !title.trim()) return;
+    const content = prompt('Post content (optional):') || '';
+    const subreddit = prompt('Sub-reddit (general, cs201, etc.):') || 'general';
+    await addDoc(collection(db, 'posts'), {
+      title: title.trim(),
+      content: content.trim(),
+      author: user.name,
+      authorAvatar: getInitials(user.name),
+      subreddit,
+      upvotes: 0,
+      downvotes: 0,
+      comments: 0,
+      timestamp: 'just now',
+      isUpvoted: false,
+      isDownvoted: false,
+      isSaved: false,
+      createdAt: serverTimestamp()
+    });
+    toast.success('Post created!');
   };
 
+  const handleSendComment = async (content: string, parentId?: string) => {
+    if (!content.trim() || !selectedPost || !db) return;
+    await addDoc(collection(db, 'posts', selectedPost, 'comments'), {
+      author: user.name,
+      authorAvatar: getInitials(user.name),
+      content: content.trim(),
+      upvotes: 0,
+      downvotes: 0,
+      timestamp: serverTimestamp(),
+      parentId: parentId || null,
+      isUpvoted: false,
+      isDownvoted: false
+    });
+    await updateDoc(doc(db, 'posts', selectedPost), { comments: increment(1) });
+    setNewComment('');
+  };
+
+  const handleVotePost = async (postId: string, dir: 1 | -1) => {
+    if (!db) return;
+    const ref = doc(db, 'posts', postId);
+    await updateDoc(ref, {
+      upvotes: increment(dir === 1 ? 1 : 0),
+      downvotes: increment(dir === -1 ? 1 : 0)
+    });
+  };
+
+  const handleVoteComment = async (commentId: string, dir: 1 | -1) => {
+    if (!db || !selectedPost) return;
+    const ref = doc(db, 'posts', selectedPost, 'comments', commentId);
+    await updateDoc(ref, {
+      upvotes: increment(dir === 1 ? 1 : 0),
+      downvotes: increment(dir === -1 ? 1 : 0)
+    });
+  };
+
+  /* ---------- UTILS ---------- */
+  const getInitials = (name: string) =>
+    name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase();
+
+  const formatTime = (t?: Timestamp) => (t ? t.toDate().toLocaleString() : '');
+
+  /* ---------- SEARCH ---------- */
+  const filteredThreads = threads.filter((t) =>
+    t.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const filteredPosts = posts.filter((p) =>
+    p.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  /* ---------- RENDER ---------- */
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <Navigation
@@ -176,9 +309,7 @@ export function ChatDiscussion({ user, onNavigate, onLogout, darkMode, toggleThe
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
           <h2 className="text-gray-900 dark:text-white mb-2">Chat & Discussions</h2>
-          <p className="text-gray-600 dark:text-gray-400">
-            Connect with peers and participate in discussions
-          </p>
+          <p className="text-gray-600 dark:text-gray-400">Connect with peers and participate in discussions</p>
         </div>
 
         <Tabs defaultValue="chat" className="space-y-6">
@@ -191,12 +322,15 @@ export function ChatDiscussion({ user, onNavigate, onLogout, darkMode, toggleThe
               <Hash className="w-4 h-4 mr-2" />
               Discussion Threads
             </TabsTrigger>
+            <TabsTrigger value="posts">
+              <ThumbsUp className="w-4 h-4 mr-2" />
+              Reddit Posts
+            </TabsTrigger>
           </TabsList>
 
-          {/* Real-time Chat */}
+          {/* ---------- REAL-TIME CHAT ---------- */}
           <TabsContent value="chat">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              {/* Chat List */}
               <Card className="lg:col-span-1 p-4 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-gray-900 dark:text-white">Channels</h3>
@@ -205,14 +339,12 @@ export function ChatDiscussion({ user, onNavigate, onLogout, darkMode, toggleThe
                   </Button>
                 </div>
                 <div className="space-y-2">
-                  {groupChats.map(chat => (
+                  {groupChats.map((chat) => (
                     <div
                       key={chat.id}
                       onClick={() => setSelectedChat(chat.id)}
                       className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                        selectedChat === chat.id
-                          ? 'bg-blue-100 dark:bg-blue-950/30'
-                          : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                        selectedChat === chat.id ? 'bg-blue-100 dark:bg-blue-950/30' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
@@ -235,18 +367,12 @@ export function ChatDiscussion({ user, onNavigate, onLogout, darkMode, toggleThe
                 </div>
               </Card>
 
-              {/* Chat Area */}
               <Card className="lg:col-span-3 flex flex-col h-[600px] bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
-                {/* Chat Header */}
                 <div className="p-4 border-b border-gray-200 dark:border-gray-800">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-gray-900 dark:text-white">
-                        {groupChats.find(c => c.id === selectedChat)?.name}
-                      </h3>
-                      <p className="text-gray-600 dark:text-gray-400">
-                        {groupChats.find(c => c.id === selectedChat)?.members} members
-                      </p>
+                      <h3 className="text-gray-900 dark:text-white">{groupChats.find((c) => c.id === selectedChat)?.name}</h3>
+                      <p className="text-gray-600 dark:text-gray-400">{groupChats.find((c) => c.id === selectedChat)?.members} members</p>
                     </div>
                     <Button variant="ghost" size="icon">
                       <MoreVertical className="w-5 h-5" />
@@ -254,85 +380,37 @@ export function ChatDiscussion({ user, onNavigate, onLogout, darkMode, toggleThe
                   </div>
                 </div>
 
-                {/* Messages */}
                 <ScrollArea className="flex-1 p-4">
                   <div className="space-y-4">
-                    {messages.map(msg => (
-                      <div
-                        key={msg.id}
-                        className={`flex gap-3 ${msg.isCurrentUser ? 'flex-row-reverse' : ''}`}
-                      >
+                    {messages.map((msg) => (
+                      <div key={msg.id} className={`flex gap-3 ${msg.isCurrentUser ? 'flex-row-reverse' : ''}`}>
                         <Avatar className="w-10 h-10">
-                          <AvatarFallback className={`${
-                            msg.isCurrentUser 
-                              ? 'bg-gradient-to-br from-blue-600 to-indigo-600' 
-                              : 'bg-gradient-to-br from-gray-600 to-gray-700'
-                          } text-white`}>
+                          <AvatarFallback
+                            className={`${
+                              msg.isCurrentUser ? 'bg-gradient-to-br from-blue-600 to-indigo-600' : 'bg-gradient-to-br from-gray-600 to-gray-700'
+                            } text-white`}
+                          >
                             {msg.avatar}
                           </AvatarFallback>
                         </Avatar>
                         <div className={`flex-1 ${msg.isCurrentUser ? 'text-right' : ''}`}>
                           <div className="flex items-center gap-2 mb-1">
-                            {!msg.isCurrentUser && (
-                              <span className="text-gray-900 dark:text-white">{msg.sender}</span>
-                            )}
-                            <span className="text-gray-500 dark:text-gray-500">
-                              {msg.timestamp}
-                            </span>
+                            {!msg.isCurrentUser && <span className="text-gray-900 dark:text-white">{msg.sender}</span>}
+                            <span className="text-gray-500 dark:text-gray-500">{formatTime(msg.timestamp)}</span>
                           </div>
-                          <div className={`inline-block p-3 rounded-lg ${
-                            msg.isCurrentUser
-                              ? 'bg-blue-600 text-white'
-                              : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
-                          }`}>
+                          <div
+                            className={`inline-block p-3 rounded-lg ${
+                              msg.isCurrentUser ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
+                            }`}
+                          >
                             {msg.content}
                           </div>
-                          {!msg.isCurrentUser && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="mt-2"
-                              onClick={() => handleAIExplain(msg.content)}
-                            >
-                              <Sparkles className="w-3 h-3 mr-1" />
-                              AI Explain
-                            </Button>
-                          )}
                         </div>
                       </div>
                     ))}
                   </div>
                 </ScrollArea>
 
-                {/* AI Assistant */}
-                {showAIAssist && (
-                  <div className="p-4 border-t border-b border-gray-200 dark:border-gray-800 bg-blue-50 dark:bg-blue-950/30">
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                        <Sparkles className="w-4 h-4 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="text-blue-900 dark:text-blue-300 mb-2">AI Explanation</h4>
-                        <p className="text-blue-800 dark:text-blue-200">
-                          The delete operation in a Binary Search Tree involves three cases: 
-                          1) Deleting a leaf node (no children), 
-                          2) Deleting a node with one child, and 
-                          3) Deleting a node with two children (use in-order successor or predecessor).
-                        </p>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="mt-2"
-                          onClick={() => setShowAIAssist(false)}
-                        >
-                          Close
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Message Input */}
                 <div className="p-4 border-t border-gray-200 dark:border-gray-800">
                   <div className="flex gap-2">
                     <Input
@@ -351,30 +429,29 @@ export function ChatDiscussion({ user, onNavigate, onLogout, darkMode, toggleThe
             </div>
           </TabsContent>
 
-          {/* Discussion Threads */}
+          {/* ---------- REAL-TIME THREADS ---------- */}
           <TabsContent value="threads">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Threads List */}
               <div className="lg:col-span-2 space-y-4">
                 <Card className="p-4 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
                   <div className="flex items-center justify-between mb-4">
                     <div className="relative flex-1 mr-4">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
-                        placeholder="Search discussions..."
+                        placeholder="Search threads..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="pl-10 bg-white dark:bg-gray-950 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
                       />
                     </div>
-                    <Button>
+                    <Button onClick={handleCreateThread}>
                       <Plus className="w-4 h-4 mr-2" />
                       New Thread
                     </Button>
                   </div>
                 </Card>
 
-                {threads.map(thread => (
+                {filteredThreads.map((thread) => (
                   <Card
                     key={thread.id}
                     className="p-6 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:shadow-lg transition-shadow cursor-pointer"
@@ -383,9 +460,7 @@ export function ChatDiscussion({ user, onNavigate, onLogout, darkMode, toggleThe
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          {thread.isPinned && (
-                            <Pin className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                          )}
+                          {thread.isPinned && <Pin className="w-4 h-4 text-blue-600 dark:text-blue-400" />}
                           <h4 className="text-gray-900 dark:text-white">{thread.title}</h4>
                         </div>
                         <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
@@ -405,20 +480,17 @@ export function ChatDiscussion({ user, onNavigate, onLogout, darkMode, toggleThe
                         <ThumbsUp className="w-4 h-4" />
                         <span>{thread.likes} likes</span>
                       </div>
-                      <div className="ml-auto">
-                        Last reply {thread.lastReply}
-                      </div>
+                      <div className="ml-auto">Last reply {thread.lastReply}</div>
                     </div>
                   </Card>
                 ))}
               </div>
 
-              {/* Thread Categories */}
               <div className="space-y-4">
                 <Card className="p-6 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
                   <h3 className="text-gray-900 dark:text-white mb-4">Categories</h3>
                   <div className="space-y-2">
-                    {['General', 'Data Structures', 'Algorithms', 'Databases', 'Web Development', 'Help Needed'].map(category => (
+                    {['General', 'Data Structures', 'Algorithms', 'Databases', 'Web Development', 'Help Needed'].map((category) => (
                       <button
                         key={category}
                         className="w-full text-left p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-white transition-colors"
@@ -432,7 +504,7 @@ export function ChatDiscussion({ user, onNavigate, onLogout, darkMode, toggleThe
                 <Card className="p-6 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
                   <h3 className="text-gray-900 dark:text-white mb-4">Active Users</h3>
                   <div className="space-y-3">
-                    {['Sarah Ahmed', 'Ali Hassan', 'Fatima Khan', 'Ahmed Raza'].map(name => (
+                    {['Sarah Ahmed', 'Ali Hassan', 'Fatima Khan', 'Ahmed Raza'].map((name) => (
                       <div key={name} className="flex items-center gap-3">
                         <div className="relative">
                           <Avatar className="w-10 h-10">
@@ -446,6 +518,280 @@ export function ChatDiscussion({ user, onNavigate, onLogout, darkMode, toggleThe
                       </div>
                     ))}
                   </div>
+                </Card>
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* ---------- REDDIT-STYLE POSTS ---------- */}
+          <TabsContent value="posts">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              {/* Main Content */}
+              <div className="lg:col-span-3 space-y-4">
+                {/* Search + Create */}
+                <Card className="p-4 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="relative flex-1 mr-4">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Input
+                        placeholder="Search posts..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10 bg-white dark:bg-gray-950 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
+                      />
+                    </div>
+                    <Button onClick={handleCreatePost}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      New Post
+                    </Button>
+                  </div>
+                </Card>
+
+                {/* Posts List or Selected Post */}
+                {!selectedPost ? (
+                  <div className="space-y-4">
+                    {filteredPosts.map((post) => (
+                      <Card
+                        key={post.id}
+                        className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-colors cursor-pointer"
+                        onClick={() => setSelectedPost(post.id)}
+                      >
+                        <div className="flex">
+                          {/* Vote Column */}
+                          <div className="flex flex-col items-center p-3 bg-gray-50 dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className={`h-8 w-8 ${post.isUpvoted ? 'text-orange-500' : 'text-gray-500'}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleVotePost(post.id, 1);
+                              }}
+                            >
+                              <ArrowUp className="h-4 w-4" />
+                            </Button>
+                            <span
+                              className={`text-sm font-semibold py-1 ${
+                                post.upvotes - post.downvotes > 0 ? 'text-orange-500' : post.upvotes - post.downvotes < 0 ? 'text-blue-500' : 'text-gray-500'
+                              }`}
+                            >
+                              {post.upvotes - post.downvotes}
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className={`h-8 w-8 ${post.isDownvoted ? 'text-blue-500' : 'text-gray-500'}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleVotePost(post.id, -1);
+                              }}
+                            >
+                              <ArrowDown className="h-4 w-4" />
+                            </Button>
+                          </div>
+
+                          {/* Post Content */}
+                          <div className="flex-1 p-4">
+                            <div className="flex items-center gap-2 mb-2 text-sm text-gray-500 dark:text-gray-400">
+                              <span className="font-semibold text-gray-900 dark:text-gray-100">r/{post.subreddit}</span>
+                              <span>•</span>
+                              <span>Posted by u/{post.author}</span>
+                              <span>•</span>
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                <span>{post.timestamp}</span>
+                              </div>
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{post.title}</h3>
+                            {post.content && <p className="text-gray-700 dark:text-gray-300 mb-3 whitespace-pre-wrap">{post.content}</p>}
+                            <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                              <Button variant="ghost" size="sm" className="gap-2">
+                                <MessageCircle className="h-4 w-4" />
+                                <span>{post.comments} Comments</span>
+                              </Button>
+                              <Button variant="ghost" size="sm" className="gap-2">
+                                <Share2 className="h-4 w-4" />
+                                <span>Share</span>
+                              </Button>
+                              <Button variant="ghost" size="sm" className={`gap-2 ${post.isSaved ? 'text-blue-500' : ''}`}>
+                                <Bookmark className="h-4 w-4" />
+                                <span>Save</span>
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {/* Back Button */}
+                    <Button variant="ghost" onClick={() => setSelectedPost(null)} className="mb-2">
+                      ← Back to Posts
+                    </Button>
+
+                    {/* Selected Post */}
+                    {(() => {
+                      const post = posts.find((p) => p.id === selectedPost);
+                      if (!post) return null;
+                      return (
+                        <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+                          <div className="flex">
+                            {/* Vote Column */}
+                            <div className="flex flex-col items-center p-3 bg-gray-50 dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className={`h-8 w-8 ${post.isUpvoted ? 'text-orange-500' : 'text-gray-500'}`}
+                                onClick={() => handleVotePost(post.id, 1)}
+                              >
+                                <ArrowUp className="h-4 w-4" />
+                              </Button>
+                              <span
+                                className={`text-sm font-semibold py-1 ${
+                                  post.upvotes - post.downvotes > 0 ? 'text-orange-500' : post.upvotes - post.downvotes < 0 ? 'text-blue-500' : 'text-gray-500'
+                                }`}
+                              >
+                                {post.upvotes - post.downvotes}
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className={`h-8 w-8 ${post.isDownvoted ? 'text-blue-500' : 'text-gray-500'}`}
+                                onClick={() => handleVotePost(post.id, -1)}
+                              >
+                                <ArrowDown className="h-4 w-4" />
+                              </Button>
+                            </div>
+
+                            {/* Post Content */}
+                            <div className="flex-1 p-4">
+                              <div className="flex items-center gap-2 mb-2 text-sm text-gray-500 dark:text-gray-400">
+                                <span className="font-semibold text-gray-900 dark:text-gray-100">r/{post.subreddit}</span>
+                                <span>•</span>
+                                <span>Posted by u/{post.author}</span>
+                                <span>•</span>
+                                <div className="flex items-center gap-1">
+                                  <Clock className="h-3 w-3" />
+                                  <span>{post.timestamp}</span>
+                                </div>
+                              </div>
+                              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{post.title}</h3>
+                              {post.content && <p className="text-gray-700 dark:text-gray-300 mb-3 whitespace-pre-wrap">{post.content}</p>}
+                            </div>
+                          </div>
+                        </Card>
+                      );
+                    })()}
+
+                    {/* Comments Section */}
+                    <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-4">
+                      <div className="mb-4">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Comments ({comments.length})</h3>
+                        <div className="flex items-center gap-2 mb-4">
+                          <Input
+                            placeholder="Add a comment..."
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                            className="flex-1"
+                          />
+                          <Button onClick={() => handleSendComment(newComment)}>Comment</Button>
+                        </div>
+                      </div>
+
+                      <ScrollArea className="h-[600px]">
+                        <div className="space-y-4">
+                          {comments.map((comment) => (
+                            <div key={comment.id} className="border-l-2 border-gray-200 dark:border-gray-700 pl-4">
+                              <div className="flex gap-3">
+                                {/* Vote Column */}
+                                <div className="flex flex-col items-center">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className={`h-6 w-6 ${comment.isUpvoted ? 'text-orange-500' : 'text-gray-500'}`}
+                                    onClick={() => handleVoteComment(comment.id, 1)}
+                                  >
+                                    <ArrowUp className="h-3 w-3" />
+                                  </Button>
+                                  <span
+                                    className={`text-xs font-medium py-0.5 ${
+                                      comment.upvotes - comment.downvotes > 0 ? 'text-orange-500' : comment.upvotes - comment.downvotes < 0 ? 'text-blue-500' : 'text-gray-500'
+                                    }`}
+                                  >
+                                    {comment.upvotes - comment.downvotes}
+                                  </span>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className={`h-6 w-6 ${comment.isDownvoted ? 'text-blue-500' : 'text-gray-500'}`}
+                                    onClick={() => handleVoteComment(comment.id, -1)}
+                                  >
+                                    <ArrowDown className="h-3 w-3" />
+                                  </Button>
+                                </div>
+
+                                {/* Comment Content */}
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1 text-xs text-gray-500 dark:text-gray-400">
+                                    <Avatar className="h-5 w-5">
+                                      <AvatarFallback className="text-xs">{comment.authorAvatar}</AvatarFallback>
+                                    </Avatar>
+                                    <span className="font-semibold text-gray-900 dark:text-gray-100">u/{comment.author}</span>
+                                    <span>•</span>
+                                    <div className="flex items-center gap-1">
+                                      <Clock className="h-3 w-3" />
+                                      <span>{formatTime(comment.timestamp)}</span>
+                                    </div>
+                                  </div>
+                                  <p className="text-gray-700 dark:text-gray-300 mb-2 whitespace-pre-wrap text-sm">{comment.content}</p>
+                                  <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                                    <Button variant="ghost" size="sm" className="h-6 px-2 gap-1">
+                                      <Reply className="h-3 w-3" />
+                                      <span>Reply</span>
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </Card>
+                  </div>
+                )}
+              </div>
+
+              {/* Sidebar */}
+              <div className="space-y-4">
+                <Card className="p-4 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      placeholder="Search posts..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </Card>
+
+                <Card className="p-4 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
+                  <Button className="w-full gap-2" onClick={handleCreatePost}>
+                    <Plus className="h-4 w-4" />
+                    Create Post
+                  </Button>
+                </Card>
+
+                <Card className="p-4 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Community Rules</h3>
+                  <ul className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
+                    <li>• Be respectful and kind</li>
+                    <li>• Stay on topic</li>
+                    <li>• No spam or self-promotion</li>
+                    <li>• Follow academic integrity</li>
+                    <li>• Help others learn</li>
+                  </ul>
                 </Card>
               </div>
             </div>

@@ -6,6 +6,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
+import { generateQuizAI } from '@/lib/aiQuizGenerator';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { 
@@ -99,30 +100,38 @@ export function AIQuiz({ user, onNavigate, onLogout, darkMode, toggleTheme }: AI
     }
   ];
 
-  const [questions] = useState<Question[]>(mockQuestions);
+  const [questions, setQuestions] = useState<Question[]>([]);
 
-  const handleGenerateQuiz = () => {
-    if (!quizTopic.trim()) {
-      toast.error('Please enter a topic');
-      return;
-    }
-    toast.success('Quiz generated successfully!');
-    setAnswers(new Array(questions.length).fill(null));
+  const handleGenerateQuiz = async () => {
+  if (!quizTopic.trim()) {
+    toast.error('Please enter a topic');
+    return;
+  }
+  try {
+    const generated = await generateQuizAI(quizTopic, parseInt(questionCount), difficulty as any);
+    setQuestions(generated);
+    setAnswers(new Array(generated.length).fill(null));
     setMode('quiz');
-  };
+    toast.success('AI quiz generated!');
+  } catch (err) {
+    console.error(err);
+    toast.error('Failed to generate quiz. Try again.');
+  }
+};
 
   const handleAnswerSelect = (optionIndex: number) => {
     setSelectedAnswer(optionIndex);
     const newAnswers = [...answers];
     newAnswers[currentQuestionIndex] = optionIndex;
     setAnswers(newAnswers);
+    setShowExplanation(true);
   };
 
   const handleNext = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswer(answers[currentQuestionIndex + 1]);
-      setShowExplanation(false);
+      
     }
   };
 
@@ -130,7 +139,7 @@ export function AIQuiz({ user, onNavigate, onLogout, darkMode, toggleTheme }: AI
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
       setSelectedAnswer(answers[currentQuestionIndex - 1]);
-      setShowExplanation(false);
+      
     }
   };
 
@@ -330,28 +339,31 @@ export function AIQuiz({ user, onNavigate, onLogout, darkMode, toggleTheme }: AI
               </h3>
 
               <RadioGroup value={selectedAnswer?.toString()} onValueChange={(val) => handleAnswerSelect(parseInt(val))}>
-                <div className="space-y-3">
-                  {currentQuestion.options.map((option, index) => (
-                    <div
-                      key={index}
-                      className={`flex items-center space-x-3 p-4 border-2 rounded-lg transition-colors cursor-pointer ${
-                        selectedAnswer === index
-                          ? 'border-blue-600 dark:border-blue-400 bg-blue-50 dark:bg-blue-950/30'
-                          : 'border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700'
-                      }`}
-                      onClick={() => handleAnswerSelect(index)}
-                    >
-                      <RadioGroupItem value={index.toString()} id={`option-${index}`} />
-                      <Label 
-                        htmlFor={`option-${index}`} 
-                        className="flex-1 cursor-pointer text-gray-900 dark:text-white"
-                      >
-                        {option}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </RadioGroup>
+  <div className="space-y-3">
+    {Array.isArray(currentQuestion.options) ? (
+      currentQuestion.options.map((option, index) => (
+        <div
+          key={index}
+          onClick={() => handleAnswerSelect(index)}
+          className={`flex items-center space-x-3 p-4 border-2 rounded-lg transition-colors cursor-pointer ${
+            selectedAnswer === index
+              ? 'border-blue-600 dark:border-blue-400 bg-blue-50 dark:bg-blue-950/30'
+              : 'border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700'
+          }`}
+        >
+          <RadioGroupItem value={index.toString()} id={`option-${index}`} />
+          <Label htmlFor={`option-${index}`} className="flex-1 cursor-pointer text-gray-900 dark:text-white">
+            {option}
+          </Label>
+        </div>
+      ))
+    ) : (
+      <div className="text-red-600 dark:text-red-400">
+    Invalid options format received from AI.
+      </div>
+    )}
+  </div>
+</RadioGroup>
 
               {showExplanation && (
                 <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
@@ -442,7 +454,7 @@ export function AIQuiz({ user, onNavigate, onLogout, darkMode, toggleTheme }: AI
                 const isCorrect = answers[index] === question.correctAnswer;
                 return (
                   <div
-                    key={question.id}
+                    key={index}
                     className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg"
                   >
                     <div className="flex-1">
