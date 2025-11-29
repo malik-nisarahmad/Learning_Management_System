@@ -25,6 +25,7 @@
     "cloudinary": "^2.8.0",
     "clsx": "^2.1.0",
     "cookie-parser": "^1.4.7",
+    "date-fns": "^4.1.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "firebase": "^12.5.0",

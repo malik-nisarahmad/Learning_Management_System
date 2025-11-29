@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Navigation } from './Navigation';
-import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
@@ -16,7 +15,6 @@ import {
   Bell,
   BellOff,
   Plus,
-  Filter,
   Check,
   X
 } from 'lucide-react';
@@ -28,7 +26,6 @@ interface EventsProps {
   onNavigate: (screen: Screen) => void;
   onLogout: () => void;
   darkMode: boolean;
-  toggleTheme: () => void;
 }
 
 interface Event {
@@ -41,11 +38,9 @@ interface Event {
   category: 'Academic' | 'Social' | 'Workshop' | 'Seminar' | 'Exam' | 'Holiday';
   organizer: string;
   attendees: number;
-  isRegistered?: boolean;
-  hasReminder?: boolean;
 }
 
-export function Events({ user, onNavigate, onLogout, darkMode, toggleTheme }: EventsProps) {
+export function Events({ user, onNavigate, onLogout, darkMode }: EventsProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [registeredEvents, setRegisteredEvents] = useState<Set<string>>(new Set(['1', '3']));
@@ -55,7 +50,7 @@ export function Events({ user, onNavigate, onLogout, darkMode, toggleTheme }: Ev
     {
       id: '1',
       title: 'Tech Talk: AI in Education',
-      description: 'Join us for an insightful discussion on how artificial intelligence is transforming education and learning experiences.',
+      description: 'Join us for an insightful discussion on how artificial intelligence is transforming education.',
       date: 'November 15, 2025',
       time: '2:00 PM - 4:00 PM',
       location: 'Auditorium A, Main Building',
@@ -66,7 +61,7 @@ export function Events({ user, onNavigate, onLogout, darkMode, toggleTheme }: Ev
     {
       id: '2',
       title: 'Web Development Workshop',
-      description: 'Hands-on workshop covering modern web development technologies including React, Node.js, and MongoDB.',
+      description: 'Hands-on workshop covering modern web development technologies.',
       date: 'November 16, 2025',
       time: '10:00 AM - 5:00 PM',
       location: 'Lab 301, CS Building',
@@ -77,7 +72,7 @@ export function Events({ user, onNavigate, onLogout, darkMode, toggleTheme }: Ev
     {
       id: '3',
       title: 'CS Department Seminar',
-      description: 'Annual seminar featuring guest speakers from leading tech companies discussing industry trends.',
+      description: 'Annual seminar featuring guest speakers from leading tech companies.',
       date: 'November 18, 2025',
       time: '10:00 AM - 12:00 PM',
       location: 'Room 301, CS Building',
@@ -90,7 +85,7 @@ export function Events({ user, onNavigate, onLogout, darkMode, toggleTheme }: Ev
       title: 'Hackathon 2025',
       description: '24-hour coding competition. Build innovative solutions and win exciting prizes!',
       date: 'November 22, 2025',
-      time: '9:00 AM (22nd) - 9:00 AM (23rd)',
+      time: '9:00 AM - 9:00 AM',
       location: 'Innovation Lab',
       category: 'Workshop',
       organizer: 'Tech Society',
@@ -110,35 +105,13 @@ export function Events({ user, onNavigate, onLogout, darkMode, toggleTheme }: Ev
     {
       id: '6',
       title: 'Alumni Meetup',
-      description: 'Network with FAST alumni working in top tech companies. Great opportunity for career guidance.',
+      description: 'Network with FAST alumni working in top tech companies.',
       date: 'November 25, 2025',
       time: '6:00 PM - 9:00 PM',
       location: 'Student Center',
       category: 'Social',
       organizer: 'Alumni Relations',
       attendees: 78
-    },
-    {
-      id: '7',
-      title: 'Machine Learning Seminar',
-      description: 'Introduction to Machine Learning algorithms and their real-world applications.',
-      date: 'November 20, 2025',
-      time: '3:00 PM - 5:00 PM',
-      location: 'Auditorium B',
-      category: 'Seminar',
-      organizer: 'Dr. Ahmed Raza',
-      attendees: 112
-    },
-    {
-      id: '8',
-      title: 'Winter Break',
-      description: 'University closed for winter holidays. Enjoy your break!',
-      date: 'December 20, 2025',
-      time: 'All Day',
-      location: 'N/A',
-      category: 'Holiday',
-      organizer: 'Academic Office',
-      attendees: 0
     }
   ];
 
@@ -168,7 +141,7 @@ export function Events({ user, onNavigate, onLogout, darkMode, toggleTheme }: Ev
         toast.info('Registration cancelled');
       } else {
         newSet.add(eventId);
-        toast.success('Registered for event!');
+        toast.success('Registered for event');
       }
       return newSet;
     });
@@ -182,22 +155,10 @@ export function Events({ user, onNavigate, onLogout, darkMode, toggleTheme }: Ev
         toast.info('Reminder disabled');
       } else {
         newSet.add(eventId);
-        toast.success('Reminder enabled!');
+        toast.success('Reminder enabled');
       }
       return newSet;
     });
-  };
-
-  const getCategoryColor = (category: string) => {
-    const colors = {
-      'Academic': 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
-      'Social': 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
-      'Workshop': 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300',
-      'Seminar': 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300',
-      'Exam': 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
-      'Holiday': 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
-    };
-    return colors[category as keyof typeof colors] || colors['Academic'];
   };
 
   const renderEventCard = (event: Event) => {
@@ -205,286 +166,237 @@ export function Events({ user, onNavigate, onLogout, darkMode, toggleTheme }: Ev
     const hasReminder = remindersEnabled.has(event.id);
 
     return (
-      <Card key={event.id} className="p-6 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:shadow-lg transition-shadow">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <h4 className="text-gray-900 dark:text-white">{event.title}</h4>
-            </div>
-            <p className="text-gray-600 dark:text-gray-400 mb-3">{event.description}</p>
-          </div>
-          <Badge className={getCategoryColor(event.category)}>
+      <div 
+        key={event.id} 
+        className="bg-slate-900/60 border border-slate-800/60 backdrop-blur-md rounded-2xl p-5 sm:p-6 hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/10 transition-all duration-300 group"
+      >
+        <div className="flex items-start justify-between mb-3">
+          <h3 className="text-white font-semibold pr-3 group-hover:text-indigo-400 transition-colors">{event.title}</h3>
+          <Badge className="bg-indigo-500/10 text-indigo-400 border-indigo-500/20 text-xs font-medium shrink-0 rounded-lg">
             {event.category}
           </Badge>
         </div>
+        
+        <p className="text-sm text-slate-400 mb-4 line-clamp-2">{event.description}</p>
 
-        <div className="space-y-2 mb-4">
-          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-            <CalendarIcon className="w-4 h-4 flex-shrink-0" />
+        <div className="space-y-2 mb-4 text-sm">
+          <div className="flex items-center gap-2 text-slate-300">
+            <CalendarIcon className="w-4 h-4 text-slate-500 shrink-0" />
             <span>{event.date}</span>
           </div>
-          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-            <Clock className="w-4 h-4 flex-shrink-0" />
+          <div className="flex items-center gap-2 text-slate-300">
+            <Clock className="w-4 h-4 text-slate-500 shrink-0" />
             <span>{event.time}</span>
           </div>
-          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-            <MapPin className="w-4 h-4 flex-shrink-0" />
-            <span>{event.location}</span>
+          <div className="flex items-center gap-2 text-slate-300">
+            <MapPin className="w-4 h-4 text-slate-500 shrink-0" />
+            <span className="truncate">{event.location}</span>
           </div>
-          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-            <Users className="w-4 h-4 flex-shrink-0" />
+          <div className="flex items-center gap-2 text-slate-300">
+            <Users className="w-4 h-4 text-slate-500 shrink-0" />
             <span>{event.organizer}</span>
-            {event.attendees > 0 && <span>• {event.attendees} attending</span>}
+            {event.attendees > 0 && <span className="text-slate-500">· {event.attendees} attending</span>}
           </div>
         </div>
 
         {isRegistered && (
-          <div className="mb-4 p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg flex items-center gap-2">
-            <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
-            <span className="text-green-800 dark:text-green-200">You are registered for this event</span>
+          <div className="mb-4 px-3 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center gap-2">
+            <Check className="w-4 h-4 text-emerald-500" />
+            <span className="text-sm text-emerald-500 font-medium">Registered</span>
           </div>
         )}
 
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           {event.category !== 'Exam' && event.category !== 'Holiday' && (
             <Button
               variant={isRegistered ? 'outline' : 'default'}
-              className="flex-1"
+              className={`flex-1 text-sm h-10 rounded-xl transition-all ${
+                isRegistered 
+                  ? 'bg-transparent border-slate-700 text-slate-400 hover:bg-slate-800 hover:border-red-500/50 hover:text-red-400' 
+                  : 'bg-indigo-600 hover:bg-indigo-700 text-white border-0 shadow-lg shadow-indigo-500/20'
+              }`}
               onClick={() => handleRegister(event.id)}
             >
-              {isRegistered ? (
-                <>
-                  <X className="w-4 h-4 mr-2" />
-                  Cancel Registration
-                </>
-              ) : (
-                <>
-                  <Check className="w-4 h-4 mr-2" />
-                  Register
-                </>
-              )}
+              {isRegistered ? <><X className="w-4 h-4 mr-1" />Cancel</> : <><Check className="w-4 h-4 mr-1" />Register</>}
             </Button>
           )}
           <Button
             variant="outline"
-            className={event.category === 'Exam' || event.category === 'Holiday' ? 'flex-1' : ''}
+            className={`${event.category === 'Exam' || event.category === 'Holiday' ? 'flex-1' : ''} text-sm h-10 rounded-xl bg-transparent border-slate-700 text-slate-400 hover:bg-slate-800 hover:border-indigo-500/50 hover:text-indigo-400 transition-all`}
             onClick={() => handleToggleReminder(event.id)}
           >
-            {hasReminder ? (
-              <>
-                <BellOff className="w-4 h-4 mr-2" />
-                Remove Reminder
-              </>
-            ) : (
-              <>
-                <Bell className="w-4 h-4 mr-2" />
-                Set Reminder
-              </>
-            )}
+            {hasReminder ? <><BellOff className="w-4 h-4 mr-1" />Off</> : <><Bell className="w-4 h-4 mr-1" />Remind</>}
           </Button>
         </div>
-      </Card>
+      </div>
     );
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <Navigation
-        user={user}
-        currentScreen="events"
-        onNavigate={onNavigate}
-        onLogout={onLogout}
-        darkMode={darkMode}
-        toggleTheme={toggleTheme}
-      />
+    <div className="min-h-screen bg-[#030712] text-slate-200 font-sans selection:bg-indigo-500/30">
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
+      </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-gray-900 dark:text-white mb-2">Events & Calendar</h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              Stay updated with upcoming events and important dates
-            </p>
+      <div className="relative z-10">
+        <Navigation user={user} currentScreen="events" onNavigate={onNavigate} onLogout={onLogout} darkMode={darkMode} />
+
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-8 sm:pt-24">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-white mb-2">Events</h1>
+              <p className="text-slate-400">Stay updated with upcoming events</p>
+            </div>
+            {user.role === 'admin' && (
+              <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-indigo-600 hover:bg-indigo-700 text-white h-11 px-5 rounded-xl text-sm font-semibold shadow-lg shadow-indigo-500/20">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Event
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-slate-900 border-slate-800 max-w-lg rounded-2xl">
+                  <DialogHeader>
+                    <DialogTitle className="text-white text-xl">Create Event</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 mt-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="eventTitle" className="text-slate-400 text-sm font-medium">Title</Label>
+                      <Input id="eventTitle" placeholder="Event title" className="bg-slate-950/50 border-slate-800 text-white h-11 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="eventDate" className="text-slate-400 text-sm font-medium">Date</Label>
+                        <Input id="eventDate" type="date" className="bg-slate-950/50 border-slate-800 text-white h-11 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="eventTime" className="text-slate-400 text-sm font-medium">Time</Label>
+                        <Input id="eventTime" placeholder="2:00 PM - 4:00 PM" className="bg-slate-950/50 border-slate-800 text-white h-11 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="eventLocation" className="text-slate-400 text-sm font-medium">Location</Label>
+                      <Input id="eventLocation" placeholder="Event location" className="bg-slate-950/50 border-slate-800 text-white h-11 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="eventDescription" className="text-slate-400 text-sm font-medium">Description</Label>
+                      <Textarea id="eventDescription" placeholder="Event description" rows={3} className="bg-slate-950/50 border-slate-800 text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" />
+                    </div>
+                    <div className="flex gap-3 justify-end pt-2">
+                      <Button variant="outline" onClick={() => setCreateDialogOpen(false)} className="border-slate-700 text-slate-400 hover:bg-slate-800 h-11 px-5 rounded-xl">
+                        Cancel
+                      </Button>
+                      <Button onClick={() => { toast.success('Event created'); setCreateDialogOpen(false); }} className="bg-indigo-600 hover:bg-indigo-700 text-white h-11 px-5 rounded-xl">
+                        Create
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
-          {user.role === 'admin' && (
-            <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Event
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle className="text-gray-900 dark:text-white">Create New Event</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4 mt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="eventTitle" className="text-gray-900 dark:text-white">
-                      Event Title
-                    </Label>
-                    <Input
-                      id="eventTitle"
-                      placeholder="Enter event title"
-                      className="bg-white dark:bg-gray-950 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="eventDate" className="text-gray-900 dark:text-white">
-                        Date
-                      </Label>
-                      <Input
-                        id="eventDate"
-                        type="date"
-                        className="bg-white dark:bg-gray-950 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="eventTime" className="text-gray-900 dark:text-white">
-                        Time
-                      </Label>
-                      <Input
-                        id="eventTime"
-                        placeholder="e.g., 2:00 PM - 4:00 PM"
-                        className="bg-white dark:bg-gray-950 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="eventLocation" className="text-gray-900 dark:text-white">
-                      Location
-                    </Label>
-                    <Input
-                      id="eventLocation"
-                      placeholder="Event location"
-                      className="bg-white dark:bg-gray-950 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="eventDescription" className="text-gray-900 dark:text-white">
-                      Description
-                    </Label>
-                    <Textarea
-                      id="eventDescription"
-                      placeholder="Event description"
-                      rows={4}
-                      className="bg-white dark:bg-gray-950 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
-                    />
-                  </div>
-                  <div className="flex gap-2 justify-end">
-                    <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button onClick={() => {
-                      toast.success('Event created successfully!');
-                      setCreateDialogOpen(false);
-                    }}>
-                      Create Event
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-          )}
-        </div>
 
-        {/* Active Notifications */}
-        {remindersEnabled.size > 0 && (
-          <Card className="p-4 mb-6 bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800">
-            <div className="flex items-center gap-3">
-              <Bell className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              <div className="flex-1">
-                <h4 className="text-blue-900 dark:text-blue-300 mb-1">Active Reminders</h4>
-                <p className="text-blue-800 dark:text-blue-200">
-                  You have {remindersEnabled.size} event reminder{remindersEnabled.size !== 1 ? 's' : ''} enabled. 
-                  You'll be notified before each event.
-                </p>
+          {/* Active Reminders */}
+          {remindersEnabled.size > 0 && (
+            <div className="bg-slate-900/60 border border-slate-800/60 backdrop-blur-md rounded-2xl p-4 mb-6">
+              <div className="flex items-center gap-3">
+                <Bell className="w-5 h-5 text-indigo-400" />
+                <span className="text-sm text-slate-300">
+                  {remindersEnabled.size} reminder{remindersEnabled.size !== 1 ? 's' : ''} active
+                </span>
               </div>
             </div>
-          </Card>
-        )}
+          )}
 
-        {/* Category Filter */}
-        <Card className="p-4 mb-6 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
-          <div className="flex items-center gap-2 flex-wrap">
-            <Filter className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+          {/* Category Filter */}
+          <div className="flex items-center gap-2 mb-6 flex-wrap">
             {categories.map(category => (
-              <Button
+              <button
                 key={category}
-                variant={selectedCategory === category ? 'default' : 'outline'}
-                size="sm"
                 onClick={() => setSelectedCategory(category)}
+                className={`px-4 py-2 text-sm font-medium rounded-xl transition-all ${
+                  selectedCategory === category 
+                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' 
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                }`}
               >
-                {category === 'all' ? 'All Events' : category}
-              </Button>
+                {category === 'all' ? 'All' : category}
+              </button>
             ))}
           </div>
-        </Card>
 
-        {/* Events Tabs */}
-        <Tabs defaultValue="upcoming">
-          <TabsList className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 mb-6">
-            <TabsTrigger value="upcoming">
-              Upcoming Events ({upcomingEvents.length})
-            </TabsTrigger>
-            <TabsTrigger value="past">
-              Past Events ({pastEvents.length})
-            </TabsTrigger>
-            <TabsTrigger value="registered">
-              My Events ({registeredEvents.size})
-            </TabsTrigger>
-          </TabsList>
+          {/* Events Tabs */}
+          <Tabs defaultValue="upcoming">
+            <TabsList className="bg-transparent border-b border-slate-800 rounded-none w-full justify-start gap-0 h-auto p-0 mb-6">
+              <TabsTrigger 
+                value="upcoming" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-indigo-500 data-[state=active]:text-white text-slate-400 bg-transparent px-4 py-3 text-sm font-medium hover:text-slate-200"
+              >
+                Upcoming ({upcomingEvents.length})
+              </TabsTrigger>
+              <TabsTrigger 
+                value="past" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-indigo-500 data-[state=active]:text-white text-slate-400 bg-transparent px-4 py-3 text-sm font-medium hover:text-slate-200"
+              >
+                Past ({pastEvents.length})
+              </TabsTrigger>
+              <TabsTrigger 
+                value="registered" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-indigo-500 data-[state=active]:text-white text-slate-400 bg-transparent px-4 py-3 text-sm font-medium hover:text-slate-200"
+              >
+                Registered ({registeredEvents.size})
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="upcoming">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {upcomingEvents.map(event => renderEventCard(event))}
-            </div>
-            {upcomingEvents.length === 0 && (
-              <Card className="p-12 text-center bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
-                <CalendarIcon className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                <h3 className="text-gray-900 dark:text-white mb-2">No upcoming events</h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Check back later for new events
-                </p>
-              </Card>
-            )}
-          </TabsContent>
+            <TabsContent value="upcoming">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                {upcomingEvents.map(event => renderEventCard(event))}
+              </div>
+              {upcomingEvents.length === 0 && (
+                <div className="bg-slate-900/60 border border-slate-800/60 backdrop-blur-md rounded-2xl p-12 text-center">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-indigo-500/10 flex items-center justify-center">
+                    <CalendarIcon className="w-8 h-8 text-indigo-400" />
+                  </div>
+                  <h3 className="text-white font-semibold mb-2">No upcoming events</h3>
+                  <p className="text-sm text-slate-400">Check back later for new events</p>
+                </div>
+              )}
+            </TabsContent>
 
-          <TabsContent value="past">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {pastEvents.map(event => renderEventCard(event))}
-            </div>
-            {pastEvents.length === 0 && (
-              <Card className="p-12 text-center bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
-                <CalendarIcon className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                <h3 className="text-gray-900 dark:text-white mb-2">No past events</h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Past events will appear here
-                </p>
-              </Card>
-            )}
-          </TabsContent>
+            <TabsContent value="past">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                {pastEvents.map(event => renderEventCard(event))}
+              </div>
+              {pastEvents.length === 0 && (
+                <div className="bg-slate-900/60 border border-slate-800/60 backdrop-blur-md rounded-2xl p-12 text-center">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-indigo-500/10 flex items-center justify-center">
+                    <CalendarIcon className="w-8 h-8 text-indigo-400" />
+                  </div>
+                  <h3 className="text-white font-semibold mb-2">No past events</h3>
+                  <p className="text-sm text-slate-400">Past events will appear here</p>
+                </div>
+              )}
+            </TabsContent>
 
-          <TabsContent value="registered">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {events.filter(e => registeredEvents.has(e.id)).map(event => renderEventCard(event))}
-            </div>
-            {registeredEvents.size === 0 && (
-              <Card className="p-12 text-center bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
-                <CalendarIcon className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                <h3 className="text-gray-900 dark:text-white mb-2">No registered events</h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  Register for events to see them here
-                </p>
-                <Button onClick={() => document.querySelector('[value="upcoming"]')?.dispatchEvent(new Event('click', { bubbles: true }))}>
-                  Browse Events
-                </Button>
-              </Card>
-            )}
-          </TabsContent>
-        </Tabs>
-      </main>
+            <TabsContent value="registered">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                {events.filter(e => registeredEvents.has(e.id)).map(event => renderEventCard(event))}
+              </div>
+              {registeredEvents.size === 0 && (
+                <div className="bg-slate-900/60 border border-slate-800/60 backdrop-blur-md rounded-2xl p-12 text-center">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-indigo-500/10 flex items-center justify-center">
+                    <CalendarIcon className="w-8 h-8 text-indigo-400" />
+                  </div>
+                  <h3 className="text-white font-semibold mb-2">No registered events</h3>
+                  <p className="text-sm text-slate-400">Register for events to see them here</p>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </main>
+      </div>
     </div>
   );
 }

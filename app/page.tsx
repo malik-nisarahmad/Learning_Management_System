@@ -8,7 +8,7 @@ import { Dashboard } from '@/components/Dashboard';
 import { ProfileManagement } from '@/components/ProfileManagement';
 import { StudyMaterials } from '@/components/StudyMaterials';
 import { AIQuiz } from '@/components/AIQuiz';
-import { ChatDiscussion } from '@/components/ChatDiscussion';
+import { ChatApp } from '@/components/chat';
 import { FacultyContact } from '@/components/FacultyContact';
 import { Events } from '@/components/Events';
 import { Toaster } from '@/components/ui/sonner';
@@ -41,16 +41,12 @@ export type Screen =
 export default function Page() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('landing');
   const [user, setUser] = useState<User | null>(null);
-  const [darkMode, setDarkMode] = useState(false);
+  const darkMode = true; // Always dark mode
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [darkMode]);
+    document.documentElement.classList.add('dark');
+  }, []);
 
   // Restore user session on page load
   useEffect(() => {
@@ -133,32 +129,28 @@ export default function Page() {
     setCurrentScreen(screen);
   };
 
-  const toggleTheme = () => {
-    setDarkMode(!darkMode);
-  };
-
   // Show loading state while checking auth
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-950 flex items-center justify-center">
+      <div className="min-h-screen bg-[#030712] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto mb-4"></div>
+          <p className="text-slate-400">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950 transition-colors">
+    <div className="min-h-screen bg-[#030712] transition-colors">
       {currentScreen === 'landing' && (
-        <Landing onNavigate={navigate} darkMode={darkMode} toggleTheme={toggleTheme} />
+        <Landing onNavigate={navigate} darkMode={darkMode} />
       )}
       {currentScreen === 'login' && (
-        <Login onLogin={handleLogin} onNavigate={navigate} darkMode={darkMode} toggleTheme={toggleTheme} />
+        <Login onLogin={handleLogin} onNavigate={navigate} darkMode={darkMode} />
       )}
       {currentScreen === 'register' && (
-        <Register onRegister={handleLogin} onNavigate={navigate} darkMode={darkMode} toggleTheme={toggleTheme} />
+        <Register onRegister={handleLogin} onNavigate={navigate} darkMode={darkMode} />
       )}
       {currentScreen === 'dashboard' && user && (
         <Dashboard 
@@ -166,7 +158,6 @@ export default function Page() {
           onNavigate={navigate} 
           onLogout={handleLogout}
           darkMode={darkMode}
-          toggleTheme={toggleTheme}
         />
       )}
       {currentScreen === 'profile' && user && (
@@ -176,7 +167,6 @@ export default function Page() {
           onNavigate={navigate}
           onLogout={handleLogout}
           darkMode={darkMode}
-          toggleTheme={toggleTheme}
         />
       )}
       {currentScreen === 'materials' && user && (
@@ -185,7 +175,6 @@ export default function Page() {
           onNavigate={navigate}
           onLogout={handleLogout}
           darkMode={darkMode}
-          toggleTheme={toggleTheme}
         />
       )}
       {currentScreen === 'quiz' && user && (
@@ -194,16 +183,14 @@ export default function Page() {
           onNavigate={navigate}
           onLogout={handleLogout}
           darkMode={darkMode}
-          toggleTheme={toggleTheme}
         />
       )}
       {currentScreen === 'chat' && user && (
-        <ChatDiscussion 
+        <ChatApp 
           user={user}
           onNavigate={navigate}
           onLogout={handleLogout}
           darkMode={darkMode}
-          toggleTheme={toggleTheme}
         />
       )}
       {currentScreen === 'faculty' && user && (
@@ -212,7 +199,6 @@ export default function Page() {
           onNavigate={navigate}
           onLogout={handleLogout}
           darkMode={darkMode}
-          toggleTheme={toggleTheme}
         />
       )}
       {currentScreen === 'events' && user && (
@@ -221,7 +207,6 @@ export default function Page() {
           onNavigate={navigate}
           onLogout={handleLogout}
           darkMode={darkMode}
-          toggleTheme={toggleTheme}
         />
       )}
       <Toaster />

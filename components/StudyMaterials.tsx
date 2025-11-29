@@ -30,7 +30,6 @@ interface StudyMaterialsProps {
   onNavigate: (screen: Screen) => void;
   onLogout: () => void;
   darkMode: boolean;
-  toggleTheme: () => void;
 }
 
 interface Material {
@@ -48,7 +47,7 @@ interface Material {
   documentUrl?: string;
 }
 
-export function StudyMaterials({ user, onNavigate, onLogout, darkMode, toggleTheme }: StudyMaterialsProps) {
+export function StudyMaterials({ user, onNavigate, onLogout, darkMode }: StudyMaterialsProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedType, setSelectedType] = useState('all');
@@ -294,273 +293,250 @@ export function StudyMaterials({ user, onNavigate, onLogout, darkMode, toggleThe
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <Navigation
-        user={user}
-        currentScreen="materials"
-        onNavigate={onNavigate}
-        onLogout={onLogout}
-        darkMode={darkMode}
-        toggleTheme={toggleTheme}
-      />
+    <div className="min-h-screen bg-[#030712] text-white">
+      <Navigation user={user} currentScreen="materials" onNavigate={onNavigate} onLogout={onLogout} darkMode={darkMode} />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-8 sm:pt-24 sm:pb-12 relative z-10">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
           <div>
-            <h2 className="text-gray-900 dark:text-white mb-2">Study Materials</h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              Browse, upload, and access study materials
-            </p>
+            <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-2">Study Materials</h1>
+            <p className="text-slate-400">Access and share resources with your peers</p>
           </div>
           <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
+              <Button className="btn-glow bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all hover:-translate-y-0.5">
                 <Upload className="w-4 h-4 mr-2" />
                 Upload Material
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 max-w-2xl">
+            <DialogContent className="bg-slate-900/95 border-slate-800 backdrop-blur-xl text-white sm:max-w-[500px]">
               <DialogHeader>
-                <DialogTitle className="text-gray-900 dark:text-white">Upload Study Material</DialogTitle>
+                <DialogTitle className="text-xl font-bold text-white">Upload Material</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4 mt-4">
+              <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="uploadTitle" className="text-gray-900 dark:text-white">
-                    Title
-                  </Label>
-                  <Input
-                    id="uploadTitle"
-                    placeholder="Enter material title"
+                  <Label className="text-slate-300">Title</Label>
+                  <Input 
+                    placeholder="e.g., Data Structures Final Paper 2023" 
+                    className="bg-slate-950/50 border-slate-800 text-white placeholder:text-slate-600 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                     value={uploadForm.title}
-                    onChange={(e) => setUploadForm({ ...uploadForm, title: e.target.value })}
-                    className="bg-white dark:bg-gray-950 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
+                    onChange={(e) => setUploadForm({...uploadForm, title: e.target.value})}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="uploadCourse" className="text-gray-900 dark:text-white">
-                      Course Code
-                    </Label>
-                    <Input
-                      id="uploadCourse"
-                      placeholder="e.g., CS-201"
+                    <Label className="text-slate-300">Course Code</Label>
+                    <Input 
+                      placeholder="e.g., CS-201" 
+                      className="bg-slate-950/50 border-slate-800 text-white placeholder:text-slate-600 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                       value={uploadForm.course}
-                      onChange={(e) => setUploadForm({ ...uploadForm, course: e.target.value })}
-                      className="bg-white dark:bg-gray-950 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
+                      onChange={(e) => setUploadForm({...uploadForm, course: e.target.value})}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-gray-900 dark:text-white">Category</Label>
-                    <Select value={uploadForm.category} onValueChange={(value) => setUploadForm({ ...uploadForm, category: value })}>
-                      <SelectTrigger className="bg-white dark:bg-gray-950 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white">
-                        <SelectValue placeholder="Select category" />
+                    <Label className="text-slate-300">Category</Label>
+                    <Select 
+                      value={uploadForm.category} 
+                      onValueChange={(value) => setUploadForm({...uploadForm, category: value})}
+                    >
+                      <SelectTrigger className="bg-slate-950/50 border-slate-800 text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20">
+                        <SelectValue placeholder="Select" />
                       </SelectTrigger>
-                      <SelectContent>
-                        {categories.filter(c => c !== 'all').map(cat => (
-                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                      <SelectContent className="bg-slate-900 border-slate-800 rounded-xl">
+                        {categories.filter(c => c !== 'all').map(category => (
+                          <SelectItem key={category} value={category} className="text-white hover:bg-slate-800 focus:bg-slate-800 cursor-pointer">
+                            {category}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="uploadDescription" className="text-gray-900 dark:text-white">
-                    Description
-                  </Label>
-                  <Textarea
-                    id="uploadDescription"
-                    placeholder="Describe the material"
+                  <Label className="text-slate-300">Description</Label>
+                  <Textarea 
+                    placeholder="Brief description of the material..." 
+                    className="bg-slate-950/50 border-slate-800 text-white placeholder:text-slate-600 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 min-h-[100px]"
                     value={uploadForm.description}
-                    onChange={(e) => setUploadForm({ ...uploadForm, description: e.target.value })}
-                    rows={3}
-                    className="bg-white dark:bg-gray-950 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
+                    onChange={(e) => setUploadForm({...uploadForm, description: e.target.value})}
                   />
                 </div>
+                
                 <div className="space-y-2">
-                  <Label className="text-gray-900 dark:text-white">File Upload</Label>
-                  <DocumentUpload
+                  <Label className="text-slate-300">Document File</Label>
+                  <DocumentUpload 
                     onUploadSuccess={handleDocumentUploadSuccess}
-                    onUploadError={(error) => toast.error(error)}
-                    maxSizeMB={10}
-                    folder="fast-connect/documents"
+                    className="w-full"
                   />
                   {uploadForm.documentUrl && (
-                    <p className="text-sm text-green-600 dark:text-green-400 mt-2">
-                      ✓ Document uploaded successfully
-                    </p>
+                    <div className="text-xs text-green-400 flex items-center gap-1 mt-1">
+                      <ThumbsUp className="w-3 h-3" />
+                      File uploaded successfully
+                    </div>
                   )}
                 </div>
-                <div className="flex gap-2 justify-end">
-                  <Button variant="outline" onClick={() => setUploadDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button 
-                    onClick={handleUpload}
-                    disabled={!uploadForm.documentUrl || !uploadForm.title || !uploadForm.course || !uploadForm.category}
-                  >
-                    Upload Material
-                  </Button>
-                </div>
+
+                <Button 
+                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-semibold shadow-lg shadow-indigo-500/25 mt-4"
+                  onClick={handleUpload}
+                >
+                  Upload Material
+                </Button>
               </div>
             </DialogContent>
           </Dialog>
         </div>
 
-        {/* Search and Filters */}
-        <Card className="p-6 mb-6 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="md:col-span-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <Input
-                  placeholder="Search materials..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-white dark:bg-gray-950 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
+        {/* Filters & Search */}
+        <div className="bg-slate-900/60 border border-slate-800/50 backdrop-blur-sm rounded-2xl p-4 mb-8 shadow-lg shadow-indigo-500/5">
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex-1 relative group">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
+              <Input 
+                placeholder="Search by title, course, or description..." 
+                className="pl-11 bg-slate-950/50 border-slate-800 text-white placeholder:text-slate-600 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 h-11 transition-all"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="bg-white dark:bg-gray-950 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white">
-                <Filter className="w-4 h-4 mr-2" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map(cat => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat === 'all' ? 'All Categories' : cat}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="bg-white dark:bg-gray-950 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="likes">Most Liked</SelectItem>
-                <SelectItem value="views">Most Viewed</SelectItem>
-                <SelectItem value="recent">Most Recent</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex flex-wrap gap-3">
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-[160px] bg-slate-950/50 border-slate-800 text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 h-11">
+                  <Filter className="w-4 h-4 mr-2 text-slate-500" />
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-900 border-slate-800 rounded-xl">
+                  {categories.map(category => (
+                    <SelectItem key={category} value={category} className="text-white hover:bg-slate-800 focus:bg-slate-800 cursor-pointer">
+                      {category === 'all' ? 'All Categories' : category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={selectedType} onValueChange={setSelectedType}>
+                <SelectTrigger className="w-[140px] bg-slate-950/50 border-slate-800 text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 h-11">
+                  <FileText className="w-4 h-4 mr-2 text-slate-500" />
+                  <SelectValue placeholder="Type" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-900 border-slate-800 rounded-xl">
+                  {types.map(type => (
+                    <SelectItem key={type} value={type} className="text-white hover:bg-slate-800 focus:bg-slate-800 cursor-pointer">
+                      {type === 'all' ? 'All Types' : type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="w-[140px] bg-slate-950/50 border-slate-800 text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 h-11">
+                  <Clock className="w-4 h-4 mr-2 text-slate-500" />
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-900 border-slate-800 rounded-xl">
+                  <SelectItem value="likes" className="text-white hover:bg-slate-800 focus:bg-slate-800 cursor-pointer">Most Liked</SelectItem>
+                  <SelectItem value="views" className="text-white hover:bg-slate-800 focus:bg-slate-800 cursor-pointer">Most Viewed</SelectItem>
+                  <SelectItem value="recent" className="text-white hover:bg-slate-800 focus:bg-slate-800 cursor-pointer">Most Recent</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <div className="flex gap-2 mt-4">
-            {types.map(type => (
-              <Button
-                key={type}
-                variant={selectedType === type ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedType(type)}
-              >
-                {type === 'all' ? 'All Types' : type}
-              </Button>
-            ))}
-          </div>
-        </Card>
+        </div>
 
         {/* Materials Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredMaterials.map(material => {
+          {filteredMaterials.map((material) => {
             const TypeIcon = getTypeIcon(material.type);
             const isLiked = likedMaterials.has(material.id);
             
             return (
-              <Card key={material.id} className="p-6 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:shadow-lg transition-shadow">
+              <div 
+                key={material.id} 
+                className="group bg-slate-900/60 border border-slate-800/50 backdrop-blur-sm rounded-2xl p-6 hover:bg-slate-800/60 hover:border-indigo-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/10 hover:-translate-y-1 flex flex-col"
+              >
                 <div className="flex items-start justify-between mb-4">
-                  <div className={`w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center`}>
-                    <TypeIcon className="w-6 h-6 text-white" />
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-slate-800/50 flex items-center justify-center group-hover:bg-indigo-500/20 transition-colors">
+                      <TypeIcon className="w-6 h-6 text-slate-400 group-hover:text-indigo-400 transition-colors" />
+                    </div>
+                    <div>
+                      <Badge className="bg-indigo-500/20 text-indigo-300 border-indigo-500/30 hover:bg-indigo-500/30 mb-1">
+                        {material.course}
+                      </Badge>
+                      <p className="text-xs text-slate-500 font-medium">{material.category}</p>
+                    </div>
                   </div>
-                  <Badge variant="secondary">{material.type}</Badge>
-                </div>
-                
-                <h4 className="text-gray-900 dark:text-white mb-2">{material.title}</h4>
-                <p className="text-gray-600 dark:text-gray-400 mb-3">{material.description}</p>
-                
-                <div className="flex items-center gap-2 mb-4">
-                  <Badge variant="outline">{material.course}</Badge>
-                  <Badge variant="outline">{material.category}</Badge>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2 mb-4 text-gray-600 dark:text-gray-400">
-                  <div className="flex items-center gap-1">
-                    <ThumbsUp className="w-4 h-4" />
-                    <span>{material.likes}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Eye className="w-4 h-4" />
-                    <span>{material.views}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Download className="w-4 h-4" />
-                    <span>{material.downloads}</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-800">
-                  <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                    <Users className="w-4 h-4" />
-                    <span>{material.uploadedBy}</span>
-                  </div>
-                  <div className="flex items-center gap-1 text-gray-500 dark:text-gray-500">
-                    <Clock className="w-4 h-4" />
-                    <span>{material.uploadDate}</span>
-                  </div>
-                </div>
-
-                <div className="flex gap-2 mt-4">
                   <Button
-                    variant={isLiked ? 'default' : 'outline'}
-                    size="sm"
-                    className="flex-1"
+                    variant="ghost"
+                    size="icon"
+                    className={`h-8 w-8 rounded-full hover:bg-slate-700/50 ${isLiked ? 'text-red-400' : 'text-slate-500 hover:text-red-400'}`}
                     onClick={() => toggleLike(material.id)}
                   >
-                    <ThumbsUp className="w-4 h-4 mr-2" />
-                    {isLiked ? 'Liked' : 'Like'}
+                    <ThumbsUp className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
                   </Button>
+                </div>
+
+                <h3 className="text-lg font-bold text-white mb-2 line-clamp-1 group-hover:text-indigo-400 transition-colors">
+                  {material.title}
+                </h3>
+                <p className="text-sm text-slate-400 mb-4 line-clamp-2 flex-1">
+                  {material.description}
+                </p>
+
+                <div className="flex items-center gap-4 text-xs text-slate-500 mb-4 pb-4 border-b border-slate-800/50">
+                  <span className="flex items-center gap-1.5">
+                    <Users className="w-3.5 h-3.5" />
+                    {material.uploadedBy}
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5" />
+                    {material.uploadDate}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between mt-auto">
+                  <div className="flex items-center gap-3 text-xs text-slate-500">
+                    <span className="flex items-center gap-1.5 bg-slate-800/50 px-2 py-1 rounded-md">
+                      <ThumbsUp className="w-3 h-3" />
+                      {material.likes + (isLiked ? 1 : 0)}
+                    </span>
+                    <span className="flex items-center gap-1.5 bg-slate-800/50 px-2 py-1 rounded-md">
+                      <Eye className="w-3 h-3" />
+                      {material.views}
+                    </span>
+                  </div>
                   <Button 
                     size="sm" 
-                    className="flex-1"
+                    className="bg-slate-800 hover:bg-indigo-600 text-white border border-slate-700 hover:border-indigo-500 transition-all shadow-sm hover:shadow-indigo-500/25"
                     onClick={() => {
                       if (material.documentUrl) {
                         window.open(material.documentUrl, '_blank');
-                        // Update download count
-                        setMaterials(prevMaterials =>
-                          prevMaterials.map(m =>
-                            m.id === material.id
-                              ? { ...m, downloads: m.downloads + 1 }
-                              : m
-                          )
-                        );
                       } else {
-                        toast.error('Document URL not available');
+                        toast.info('Preview not available');
                       }
                     }}
                   >
-                    <Download className="w-4 h-4 mr-2" />
+                    <Download className="w-3.5 h-3.5 mr-1.5" />
                     Download
                   </Button>
                 </div>
-              </Card>
+              </div>
             );
           })}
         </div>
 
         {filteredMaterials.length === 0 && (
-          <Card className="p-12 text-center bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
-            <FileText className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-gray-900 dark:text-white mb-2">No materials found</h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Try adjusting your search or filters
-            </p>
-            <Button onClick={() => {
-              setSearchQuery('');
-              setSelectedCategory('all');
-              setSelectedType('all');
-            }}>
+          <div className="bg-slate-900/60 border border-slate-800/50 backdrop-blur-sm rounded-2xl p-12 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-800/50 flex items-center justify-center">
+              <FileText className="w-8 h-8 text-slate-400" />
+            </div>
+            <h3 className="text-white font-semibold mb-2">No materials found</h3>
+            <p className="text-sm text-slate-400 mb-6">Try adjusting your search or filters</p>
+            <Button onClick={() => { setSearchQuery(''); setSelectedCategory('all'); setSelectedType('all'); }} className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white h-10 px-6 rounded-xl shadow-lg shadow-indigo-500/25">
               Clear Filters
             </Button>
-          </Card>
+          </div>
         )}
       </main>
     </div>
