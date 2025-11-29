@@ -15,6 +15,7 @@ interface DocumentUploadProps {
   maxSizeMB?: number;
   acceptedTypes?: string[];
   folder?: string;
+  className?: string;
 }
 
 export function DocumentUpload({
@@ -22,7 +23,8 @@ export function DocumentUpload({
   onUploadError,
   maxSizeMB = 10,
   acceptedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
-  folder = 'fast-connect/documents'
+  folder = 'fast-connect/documents',
+  className = ''
 }: DocumentUploadProps) {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -191,7 +193,7 @@ export function DocumentUpload({
   };
 
   return (
-    <div className="space-y-4">
+    <div className={`space-y-4 ${className}`}>
       {error && (
         <Alert className="bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800">
           <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
