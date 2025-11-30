@@ -1,0 +1,64 @@
+Test ID,Feature/Module,Test Description,Input,Expected Output,Actual Output,Status
+TC-AUTH-001,Registration,Register with valid data,"Name: John Doe, Email: john@example.com, Password: Test@123",Account created success message displayed,Account created successfully,PASS
+TC-AUTH-002,Registration,Register with invalid email,"Name: John, Email: invalid-email, Password: Test@123",Error: Invalid email format,Shows validation error,PASS
+TC-AUTH-003,Registration,Register with short password,"Name: John, Email: john@test.com, Password: 123",Error: Password too short,Shows password requirement error,PASS
+TC-AUTH-004,Registration,Register with existing email,Email: existing@example.com,Error: Email already registered,Shows duplicate email error,PASS
+TC-AUTH-005,Login,Login with valid credentials,"Email: john@example.com, Password: Test@123",Redirect to Dashboard,Successfully logged in,PASS
+TC-AUTH-006,Login,Login with wrong password,"Email: john@example.com, Password: wrong",Error: Invalid credentials,Shows authentication error,PASS
+TC-AUTH-007,Login,Login with non-existent email,Email: nouser@test.com,Error: User not found,Shows user not found error,PASS
+TC-AUTH-008,Logout,Click logout button,User logged in,"Session ended, redirect to landing",Successfully logged out,PASS
+TC-AUTH-009,Session,Access dashboard without login,Direct URL to /dashboard,Redirect to login page,Redirected to login,PASS
+TC-AUTH-010,Session,Session persistence on refresh,Logged in user refreshes,User remains logged in,Session maintained,PASS
+TC-DASH-001,Dashboard,View dashboard after login,Valid login,Dashboard with stats displayed,Dashboard loads correctly,PASS
+TC-DASH-002,Navigation,Click all nav items,Each nav button,Correct page loads,All navigation works,PASS
+TC-DASH-003,User Info,Display user name,Logged in user,User name shown in header,Name displayed correctly,PASS
+TC-DASH-004,Quick Actions,Click quick action buttons,Click each button,Navigate to respective module,Actions work correctly,PASS
+TC-MAT-001,Study Materials,Upload PDF document,Valid PDF file,"File uploaded, appears in list",Upload successful,PASS
+TC-MAT-002,Study Materials,Upload image file,JPG/PNG image,Image uploaded successfully,Upload successful,PASS
+TC-MAT-003,Study Materials,Upload invalid file type,.exe file,Error: Invalid file type,Shows file type error,PASS
+TC-MAT-004,Study Materials,Upload without file selected,Click upload with no file,Error: Please select a file,Shows selection error,PASS
+TC-MAT-005,Study Materials,View uploaded materials,Click on material,Document viewer opens,Document displayed,PASS
+TC-MAT-006,Study Materials,Download material,Click download button,File downloads,Download started,PASS
+TC-MAT-007,Study Materials,Delete own material,Click delete on own file,Material removed from list,Deletion successful,PASS
+TC-MAT-008,Study Materials,Filter by subject,Select subject filter,Only relevant materials shown,Filter works correctly,PASS
+TC-QUIZ-001,AI Quiz,Generate quiz for subject,"Subject: Mathematics, Count: 5",5 questions generated,Quiz generated successfully,PASS
+TC-QUIZ-002,AI Quiz,Generate quiz without subject,No subject selected,Error: Select a subject,Shows selection error,PASS
+TC-QUIZ-003,AI Quiz,Submit correct answers,All correct answers,Score: 100%,Score calculated correctly,PASS
+TC-QUIZ-004,AI Quiz,Submit partial answers,3 out of 5 correct,Score: 60%,Score calculated correctly,PASS
+TC-QUIZ-005,AI Quiz,Submit without answering,No answers selected,Error: Answer all questions,Shows completion error,PASS
+TC-QUIZ-006,AI Quiz,View quiz results,Complete quiz,Show correct/incorrect answers,Results displayed,PASS
+TC-QUIZ-007,AI Quiz,Retry quiz,Click retry button,New quiz generated,Quiz reset successfully,PASS
+TC-DISC-001,Discussion Forum,Create discussion post,"Title: Help, Content: Question...",Post appears in feed,Post created successfully,PASS
+TC-DISC-002,Discussion Forum,Create post without title,"Empty title, valid content",Error: Title required,Shows validation error,PASS
+TC-DISC-003,Discussion Forum,Create post without content,"Valid title, empty content",Error: Content required,Shows validation error,PASS
+TC-DISC-004,Discussion Forum,View discussion feed,Navigate to discussions,All posts displayed,Posts load correctly,PASS
+TC-DISC-005,Discussion Forum,Add comment to post,Comment text on post,Comment appears under post,Comment added,PASS
+TC-DISC-006,Discussion Forum,Add empty comment,Empty comment text,Error: Comment required,Shows validation error,PASS
+TC-DISC-007,Discussion Forum,Reply to comment,Reply text,Reply appears nested,Reply added correctly,PASS
+TC-DISC-008,Discussion Forum,Upvote a post,Click upvote,Vote count increases,Vote registered,PASS
+TC-DISC-009,Discussion Forum,Downvote a post,Click downvote,Vote count decreases,Vote registered,PASS
+TC-DISC-010,Discussion Forum,Delete own post,Click delete on own post,Post removed from feed,Post deleted,PASS
+TC-DISC-011,Discussion Forum,Delete other's post,Try delete other's post,No delete option shown,Delete hidden correctly,PASS
+TC-DISC-012,Discussion Forum,Sort by newest,Select Newest sort,Posts sorted by date desc,Sorting works,PASS
+TC-DISC-013,Discussion Forum,Sort by most votes,Select Top sort,Posts sorted by votes,Sorting works,PASS
+TC-DISC-014,Discussion Forum,Filter by tag,Select tag filter,Only tagged posts shown,Filter works,PASS
+TC-CHAT-001,Chat,Send direct message,Message: Hello,Message appears in chat,Message sent,PASS
+TC-CHAT-002,Chat,Send empty message,Empty message,Send button disabled,Cannot send empty,PASS
+TC-CHAT-003,Chat,Receive message,Other user sends,Message appears in real-time,Real-time works,PASS
+TC-CHAT-004,Chat,Create chat group,"Group name, members",Group created,Group created,PASS
+TC-CHAT-005,Chat,Send to group,Message in group,All members receive,Group message works,PASS
+TC-CHAT-006,Chat,Send friend request,Click add friend,Request sent notification,Request sent,PASS
+TC-CHAT-007,Chat,Accept friend request,Click accept,Friend added to list,Friend added,PASS
+TC-CHAT-008,Chat,View online users,Check status,Green dot for online,Status displayed,PASS
+TC-FAC-001,Faculty Contact,View faculty list,Navigate to faculty,Faculty list displayed,List loads correctly,PASS
+TC-FAC-002,Faculty Contact,Generate AI email,Purpose: Extension request,Email draft generated,AI generates email,PASS
+TC-FAC-003,Faculty Contact,Send composed email,"Valid subject, body",Email sent confirmation,Email sent successfully,PASS
+TC-FAC-004,Faculty Contact,Send without subject,Empty subject,Error: Subject required,Shows validation error,PASS
+TC-FAC-005,Faculty Contact,View faculty details,Click faculty card,Contact info displayed,Details shown,PASS
+TC-PROF-001,Profile,View own profile,Navigate to profile,Profile info displayed,Profile loads,PASS
+TC-PROF-002,Profile,Change display name,New name: John Smith,Name updated everywhere,Name updated,PASS
+TC-PROF-003,Profile,Upload profile picture,Valid image file,Avatar updated,Avatar changed,PASS
+TC-PROF-004,Profile,Upload invalid file,Non-image file,Error: Invalid image,Shows error,PASS
+TC-EVT-001,Events,View upcoming events,Navigate to events,Events list displayed,Events load,PASS
+TC-EVT-002,Events,Click on event,Click event card,Event details shown,Details displayed,PASS
+TC-EVT-003,Events,View calendar,Open calendar view,Events on calendar,Calendar works,PASS
