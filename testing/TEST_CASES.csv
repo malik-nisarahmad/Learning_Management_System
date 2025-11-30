@@ -15,63 +15,107 @@ TC-DASH-001,Dashboard,Load,Dashboard loads correctly,User logged in,1. Complete 
 TC-DASH-002,Dashboard,User Info,Display user name,On dashboard,1. Check header,-,User name and avatar shown,Name from Firebase displayed in header,PASS
 TC-DASH-003,Dashboard,Navigation,Sidebar navigation,On dashboard,1. Click each nav item,-,Respective page loads,All nav items route correctly,PASS
 TC-DASH-004,Dashboard,Quick Actions,Action buttons,On dashboard,1. Click quick action buttons,-,Navigate to target module,All quick actions functional,PASS
-TC-DASH-005,Dashboard,Stats,Statistics display,On dashboard,1. View stats cards,-,Course stats displayed,Stats cards show correct data,PASS
+TC-DASH-005,Dashboard,Dynamic Stats,Materials count,On dashboard,1. View stats cards,-,Real-time materials count from Firebase,Shows actual count from materials collection,PASS
+TC-DASH-006,Dashboard,Dynamic Stats,Quiz score average,On dashboard,1. View quiz score stat,-,Average score from quizAttempts,Shows users average quiz score percentage,PASS
+TC-DASH-007,Dashboard,Dynamic Stats,Events count,On dashboard,1. View events stat,-,Upcoming events count,Shows count of future events,PASS
+TC-DASH-008,Dashboard,Refresh,Manual refresh button,On dashboard,1. Click refresh button,-,Stats reload from Firebase,Data refreshed cache invalidated,PASS
 TC-MAT-001,Study Materials,Upload,Upload PDF file,On Study Materials,"1. Click Upload 2. Select PDF 3. Fill details 4. Submit","File: sample.pdf, Title: Test PDF",File uploaded to Cloudinary,Upload successful file appears in list,PASS
 TC-MAT-002,Study Materials,Upload,Upload image file,On Study Materials,1. Upload image file,File: image.jpg,Image uploaded successfully,Upload successful with preview,PASS
-TC-MAT-003,Study Materials,Upload,Empty title,On upload dialog,"1. Skip title 2. Submit",Title: empty,Validation error,Shows Please fill in all required fields,PASS
+TC-MAT-003,Study Materials,Upload,Empty title validation,On upload dialog,"1. Skip title 2. Submit",Title: empty,Validation error,Shows Please fill in all required fields,PASS
 TC-MAT-004,Study Materials,Upload,No file selected,On upload dialog,1. Click upload without file,-,Error message,Shows file selection error,PASS
-TC-MAT-005,Study Materials,View,View material list,On Study Materials,1. Navigate to module,-,List of materials displayed,Materials loaded from state,PASS
-TC-MAT-006,Study Materials,View,Open document,On materials list,1. Click on material card,-,Document viewer opens,Document displayed in viewer,PASS
-TC-MAT-007,Study Materials,Download,Download file,On material card,1. Click download button,-,File download starts,Download initiated via Cloudinary URL,PASS
-TC-MAT-008,Study Materials,Delete,Delete own material,Own material in list,"1. Click delete 2. Confirm",-,Material removed,Material deleted from list,PASS
-TC-MAT-009,Study Materials,Filter,Filter by course,On materials list,1. Select course filter,Course: Data Structures,Filtered results shown,Only matching materials displayed,PASS
+TC-MAT-005,Study Materials,View,View material list,On Study Materials,1. Navigate to module,-,List of materials displayed,Materials loaded from Firebase real-time,PASS
+TC-MAT-006,Study Materials,View,Open document detail,On materials list,1. Click on material card,-,Document detail dialog opens,Material details with comments shown,PASS
+TC-MAT-007,Study Materials,Download,Download PDF file,On material card,1. Click download button,-,File download starts,Download initiated via Cloudinary raw URL,PASS
+TC-MAT-008,Study Materials,Delete,Delete own material,Own material in list,"1. Click delete 2. Confirm",-,Material removed,Material deleted from Firebase and UI,PASS
+TC-MAT-009,Study Materials,Filter,Filter by category,On materials list,1. Select category filter,Category: Past Papers,Filtered results shown,Only matching materials displayed,PASS
 TC-MAT-010,Study Materials,Search,Search materials,On materials list,1. Type in search box,Query: algorithm,Matching results shown,Search filter applied correctly,PASS
+TC-MAT-011,Study Materials,Like,Like a material,Material detail open,1. Click heart/like button,-,Like count increases,Like added count updated in real-time,PASS
+TC-MAT-012,Study Materials,Unlike,Remove like,Already liked material,1. Click heart again,-,Like count decreases,Like removed toggle works correctly,PASS
+TC-MAT-013,Study Materials,Comment,Add comment,Material detail open,"1. Type comment 2. Click send",Comment: Very helpful!,Comment added to material,Comment appears with author info,PASS
+TC-MAT-014,Study Materials,Comment,Empty comment validation,Material detail open,1. Click send without text,Comment: empty,Send disabled,Button disabled when input empty,PASS
+TC-MAT-015,Study Materials,Views,View count increment,Material list,1. Open material detail,-,View count +1,Views incremented in Firebase,PASS
 TC-QUIZ-001,AI Quiz,Generate,Generate AI quiz,On Quiz page,"1. Enter topic 2. Set count 3. Click Generate","Topic: Data Structures, Count: 5",5 questions generated by Groq AI,Quiz generated with 5 questions,PASS
-TC-QUIZ-002,AI Quiz,Generate,Empty topic,On Quiz page,"1. Leave topic empty 2. Click Generate",Topic: empty,Error: Enter a topic,Toast shows Please enter a topic,PASS
-TC-QUIZ-003,AI Quiz,Generate,AI API error handling,On Quiz page,1. Generate with invalid API,-,Fallback to mock questions,Graceful error handling with fallback,PASS
+TC-QUIZ-002,AI Quiz,Generate,Empty topic validation,On Quiz page,"1. Leave topic empty 2. Click Generate",Topic: empty,Error: Enter a topic,Toast shows Please enter a topic,PASS
+TC-QUIZ-003,AI Quiz,Generate,Different difficulties,On Quiz page,"1. Select each difficulty 2. Generate","Easy, Medium, Hard",Questions match difficulty,Difficulty reflected in questions,PASS
 TC-QUIZ-004,AI Quiz,Answer,Select answer,Quiz in progress,1. Click answer option,-,Answer highlighted,Selected answer styled differently,PASS
 TC-QUIZ-005,AI Quiz,Answer,Navigate questions,Quiz in progress,1. Click Next/Previous,-,Navigate between questions,Navigation works correctly,PASS
 TC-QUIZ-006,AI Quiz,Submit,Submit all answers,All questions answered,"1. Answer all 2. Submit",All 5 answered,Score calculated,Score displayed with percentage,PASS
 TC-QUIZ-007,AI Quiz,Score,100% score,All correct,"1. Answer all correctly 2. Submit",All correct answers,Score: 100%,Shows 100% - Excellent!,PASS
 TC-QUIZ-008,AI Quiz,Review,View explanations,Quiz completed,"1. Complete quiz 2. View results",-,Show correct answers and explanations,Explanations displayed for each question,PASS
 TC-QUIZ-009,AI Quiz,Retry,Restart quiz,Quiz completed,1. Click Try Again,-,New quiz generated,Quiz reset new questions loaded,PASS
+TC-QUIZ-010,AI Quiz,Save Score,Score saved to Firebase,Quiz completed,1. Complete quiz,-,Score saved to quizAttempts,Attempt record created with score time topic,PASS
+TC-QUIZ-011,AI Quiz,History,View recent attempts,On Quiz page,1. Check recent attempts section,-,Last 5 attempts shown,Attempts loaded from Firebase,PASS
+TC-QUIZ-012,AI Quiz,Stats Update,User stats updated,Quiz completed,"1. Complete quiz 2. Check dashboard",-,Average score updated,userStats collection updated,PASS
 TC-DISC-001,Discussion Forum,Create Post,Create discussion post,On Discussion Feed,"1. Click + 2. Fill form 3. Submit","Title: Help needed, Content: Question about OOP, Category: Discussion",Post created in Firebase,Post appears in feed with correct data,PASS
 TC-DISC-002,Discussion Forum,Create Post,Create question post,On Discussion Feed,"1. Select Question type 2. Submit","Category: Question, Tags: [oop help]",Question post with amber badge,Question badge displayed correctly,PASS
 TC-DISC-003,Discussion Forum,Create Post,Create announcement,On Discussion Feed,"1. Select Announcement 2. Submit",Category: Announcement,Announcement with rose badge,Announcement styled correctly,PASS
 TC-DISC-004,Discussion Forum,Create Post,Empty title validation,On create dialog,"1. Leave title empty 2. Submit",Title: empty,Error shown,Toast: Title is required,PASS
 TC-DISC-005,Discussion Forum,Create Post,Empty content validation,On create dialog,"1. Leave content empty 2. Submit",Content: empty,Error shown,Toast: Content is required,PASS
-TC-DISC-006,Discussion Forum,View Posts,Load posts,On Discussion Feed,1. Navigate to discussions,-,Posts loaded from Firebase,Real-time posts displayed,PASS
+TC-DISC-006,Discussion Forum,View Posts,Load posts real-time,On Discussion Feed,1. Navigate to discussions,-,Posts loaded from Firebase,Real-time posts displayed via onSnapshot,PASS
 TC-DISC-007,Discussion Forum,Comment,Add comment,Post expanded,"1. Type comment 2. Click Send",Comment: Great question!,Comment added to post,Comment appears with author info,PASS
 TC-DISC-008,Discussion Forum,Comment,Empty comment validation,Comment input focused,1. Click Send without text,Comment: empty,Error shown,Send button disabled/error,PASS
 TC-DISC-009,Discussion Forum,Reply,Reply to comment,Comment visible,"1. Click Reply 2. Type 3. Submit",Reply: Thanks for asking,Nested reply appears,Reply indented under parent comment,PASS
-TC-DISC-010,Discussion Forum,Reply,Threaded replies,Multiple replies,1. Reply to reply,-,Reddit-style threading,Colored thread lines displayed,PASS
+TC-DISC-010,Discussion Forum,Reply,Threaded replies Reddit-style,Multiple replies,1. Reply to reply,-,Reddit-style threading,Colored thread lines displayed,PASS
 TC-DISC-011,Discussion Forum,Upvote,Upvote post,Post visible,1. Click upvote button,-,Vote count +1,Vote count increases button highlighted,PASS
 TC-DISC-012,Discussion Forum,Downvote,Downvote post,Post visible,1. Click downvote button,-,Vote count -1,Vote count decreases,PASS
 TC-DISC-013,Discussion Forum,Delete,Delete own post,Own post visible,"1. Click menu 2. Delete 3. Confirm",-,Post removed,Post deleted from Firebase and UI,PASS
-TC-DISC-014,Discussion Forum,Delete,Cannot delete others,Others post,1. Check for delete option,-,No delete option,Delete option hidden for non-owners,PASS
+TC-DISC-014,Discussion Forum,Delete,Cannot delete others posts,Others post,1. Check for delete option,-,No delete option,Delete option hidden for non-owners,PASS
 TC-DISC-015,Discussion Forum,Sort,Sort by Hot,On Discussion Feed,1. Click Hot sort,-,Posts sorted by engagement,Posts reordered correctly,PASS
-TC-DISC-016,Discussion Forum,Sort,Sort by New,On Discussion Feed,1. Click New sort,-,Posts sorted by date (newest),Most recent posts first,PASS
-TC-CHAT-001,Chat,Send DM,Send direct message,Chat open,"1. Select user 2. Type 3. Send",Message: Hello!,Message sent and displayed,Message appears in conversation,PASS
-TC-CHAT-002,Chat,Send DM,Empty message,Chat open,1. Click send without text,Message: empty,Send disabled,Send button disabled when empty,PASS
-TC-CHAT-003,Chat,Receive,Receive message,Chat open,1. Other user sends message,-,Real-time update,Message appears instantly via Firebase,PASS
-TC-CHAT-004,Chat,Group,Create group,On chat,"1. Click Create Group 2. Add members 3. Create",Name: Study Group,Group created,Group appears in sidebar,PASS
-TC-CHAT-005,Chat,Group,Send group message,In group chat,"1. Type message 2. Send",-,All members receive,Message visible to all group members,PASS
-TC-CHAT-006,Chat,Friends,Send friend request,User selected,1. Click Add Friend,-,Request sent,Toast: Friend request sent,PASS
-TC-CHAT-007,Chat,Friends,Accept friend request,Request received,1. Click Accept,-,Friend added,User appears in friends list,PASS
-TC-CHAT-008,Chat,Friends,Decline friend request,Request received,1. Click Decline,-,Request removed,Request removed from pending,PASS
-TC-CHAT-009,Chat,Status,Online indicator,Friends list,1. Check friend status,-,Green dot for online,Online users show green indicator,PASS
-TC-CHAT-010,Chat,Search,Search users,On chat,1. Type in search,Query: John,Matching users shown,Search results filtered,PASS
+TC-DISC-016,Discussion Forum,Sort,Sort by New,On Discussion Feed,1. Click New sort,-,Posts sorted by date newest,Most recent posts first,PASS
+TC-CHAT-001,Real-time Chat,Send DM,Send direct message,Chat open user selected,"1. Select user 2. Type message 3. Send",Message: Hello!,Message sent and displayed,Message appears in conversation,PASS
+TC-CHAT-002,Real-time Chat,Send DM,Empty message validation,Chat open,1. Click send without text,Message: empty,Send disabled,Send button disabled when empty,PASS
+TC-CHAT-003,Real-time Chat,Receive,Receive message real-time,Chat open,1. Other user sends message,-,Real-time update,Message appears instantly via Firebase,PASS
+TC-CHAT-004,Real-time Chat,Group,Create group,On chat,"1. Click Create Group 2. Add name 3. Add members 4. Create","Name: Study Group, Members: 3",Group created,Group appears in sidebar,PASS
+TC-CHAT-005,Real-time Chat,Group,Send group message,In group chat,"1. Type message 2. Send",Message: Hi everyone!,All members receive,Message visible to all group members,PASS
+TC-CHAT-006,Real-time Chat,Friends,Send friend request,User profile visible,1. Click Add Friend,-,Request sent,Toast: Friend request sent,PASS
+TC-CHAT-007,Real-time Chat,Friends,Accept friend request,Request received,1. Click Accept,-,Friend added,User appears in friends list,PASS
+TC-CHAT-008,Real-time Chat,Friends,Decline friend request,Request received,1. Click Decline,-,Request removed,Request removed from pending,PASS
+TC-CHAT-009,Real-time Chat,Status,Online indicator,Friends list,1. Check friend status,-,Green dot for online,Online users show green indicator,PASS
+TC-CHAT-010,Real-time Chat,Search,Search users,On chat,1. Type in search,Query: John,Matching users shown,Search results filtered,PASS
+TC-CHAT-011,Real-time Chat,Tabs,Switch between tabs,On chat,1. Click Messages/Groups/Friends tabs,-,Tab content changes,Tab switching works correctly,PASS
+TC-CHAT-012,Real-time Chat,Timestamp,Message timestamps,In conversation,1. Check message times,-,Relative time shown,Shows 2m ago 1h ago etc,PASS
 TC-FAC-001,Faculty Contact,View,Load faculty list,On Faculty Contact,1. Navigate to module,-,24 faculty members displayed,Faculty list rendered correctly,PASS
 TC-FAC-002,Faculty Contact,Filter,Filter by department,On Faculty Contact,1. Select department,Dept: Computer Science,Filtered results,Only CS faculty shown,PASS
 TC-FAC-003,Faculty Contact,Search,Search faculty,On Faculty Contact,1. Type in search,Query: Dr. Hasan,Matching faculty shown,Search results correct,PASS
-TC-FAC-004,Faculty Contact,AI Email,Generate AI email,Email dialog open,"1. Select purpose 2. Generate",Purpose: Assignment extension,AI generates professional email,Email draft generated by Groq API,PASS
+TC-FAC-004,Faculty Contact,AI Email,Generate AI email,Email dialog open,"1. Select purpose 2. Add context 3. Generate",Purpose: Assignment extension,AI generates professional email,Email draft generated by Groq API,PASS
 TC-FAC-005,Faculty Contact,Copy,Copy email,Email generated,1. Click Copy,-,Email copied to clipboard,Toast: Email copied to clipboard,PASS
 TC-FAC-006,Faculty Contact,Send,Send email,Email composed,1. Click Send,-,Success confirmation,Toast: Email sent successfully,PASS
-TC-PROF-001,Profile,View,View profile,On Profile page,1. Navigate to Profile,-,Profile info displayed,User data rendered,PASS
-TC-PROF-002,Profile,Edit,Enable edit mode,On Profile page,1. Click Edit Profile,-,Fields become editable,Input fields enabled,PASS
-TC-PROF-003,Profile,Update,Update name,Edit mode active,"1. Change name 2. Save",Name: John Smith,Name updated,Toast: Profile updated successfully,PASS
-TC-PROF-004,Profile,Update,Update email,Edit mode active,"1. Change email 2. Save",Email: new@test.com,Email updated,Profile reflects new email,PASS
-TC-PROF-005,Profile,Avatar,View avatar,On Profile page,1. Check avatar,-,Avatar displayed,Avatar shows initials or image,PASS
-TC-EVT-001,Events,View,View events list,On Events page,1. Navigate to Events,-,Events displayed,Event cards rendered,PASS
-TC-EVT-002,Events,Details,View event details,Event visible,1. Click event card,-,Details shown,Event info displayed,PASS
-TC-EVT-003,Events,Calendar,Calendar view,On Events page,1. Check calendar,-,Calendar with events,Calendar component functional,PASS
+TC-PROF-001,Profile Management,View,View profile,On Profile page,1. Navigate to Profile,-,Profile info displayed,User data rendered,PASS
+TC-PROF-002,Profile Management,Edit,Enable edit mode,On Profile page,1. Click Edit Profile,-,Fields become editable,Input fields enabled,PASS
+TC-PROF-003,Profile Management,Update,Update name,Edit mode active,"1. Change name 2. Save",Name: John Smith,Name updated,Toast: Profile updated successfully,PASS
+TC-PROF-004,Profile Management,Update,Update department,Edit mode active,"1. Change department 2. Save",Dept: Software Engineering,Department updated,Profile reflects new department,PASS
+TC-PROF-005,Profile Management,Avatar,View avatar,On Profile page,1. Check avatar,-,Avatar displayed,Avatar shows initials or image,PASS
+TC-PROF-006,Profile Management,Stats,View user stats,On Profile page,1. Check stats section,-,Quiz stats materials count,Stats from userStats collection,PASS
+TC-EVT-001,Events,View,View events list,On Events page,1. Navigate to Events,-,Events displayed,Event cards rendered from Firebase,PASS
+TC-EVT-002,Events,View,View event details,Event visible,1. Click event card,-,Details dialog opens,Event info with description location time,PASS
+TC-EVT-003,Events,Filter,Filter by category,On Events page,1. Select category,Category: Workshop,Filtered results,Only workshop events shown,PASS
+TC-EVT-004,Events,Register,Register for event,Event detail open,1. Click Register,-,Registration saved,Toast: Registered for event! attendee count +1,PASS
+TC-EVT-005,Events,Unregister,Cancel registration,Already registered,1. Click Cancel Registration,-,Registration removed,Attendee count -1 button changes,PASS
+TC-EVT-006,Events,Reminder,Enable reminder,Event detail open,1. Click Set Reminder,-,Reminder enabled,Bell icon highlighted,PASS
+TC-EVT-007,Events,Reminder,Disable reminder,Reminder enabled,1. Click reminder again,-,Reminder disabled,Bell icon un-highlighted,PASS
+TC-EVT-008,Events,Create,Admin creates event,Admin logged in,"1. Click Create Event 2. Fill form 3. Submit","Title: Tech Talk, Date, Time, Location",Event created,Event appears in list,PASS
+TC-EVT-009,Events,Create,Society creates event,Society president logged in,"1. Select society 2. Create event","Society: ACM, Title: Hackathon",Society event created,Event shows society badge,PASS
+TC-EVT-010,Events,Tabs,View registered events,On Events page,1. Click My Events tab,-,Only registered events shown,Filtered to users registrations,PASS
+TC-EVT-011,Events,Calendar,Calendar view,On Events page,1. Check calendar section,-,Calendar with event markers,Events marked on calendar dates,PASS
+TC-EVT-012,Events,Countdown,Event countdown,Upcoming event,1. Check event card,-,Countdown displayed,Shows in 2 days in 5 hours,PASS
+TC-API-001,API Integration,Groq API,Quiz generation endpoint,API key configured,1. Generate quiz,Topic: JavaScript,200 OK JSON response,Questions array returned,PASS
+TC-API-002,API Integration,Groq API,Email generation endpoint,API key configured,1. Generate email,Purpose: meeting request,200 OK JSON with subject/body,Email draft returned,PASS
+TC-API-003,API Integration,Groq API,Invalid API key,Wrong key,1. Try generate,Invalid key,401 Unauthorized,Error handled gracefully,PASS
+TC-API-004,API Integration,Groq API,Rate limit handling,Many requests,1. Send multiple requests,10 requests/second,Rate limit respected,Retry after delay,PASS
+TC-API-005,API Integration,Firebase Auth,User creation,Valid data,1. Register user,Valid email/password,User created,Firebase Auth user exists,PASS
+TC-API-006,API Integration,Firebase Auth,Token refresh,Session active,1. Wait for token expiry,-,Token auto-refreshed,Session continues,PASS
+TC-API-007,API Integration,Firestore,Document write,User authenticated,1. Create post,Post data,Document created,Post ID returned,PASS
+TC-API-008,API Integration,Firestore,Real-time subscription,On collection,1. Subscribe to posts,-,Real-time updates,onSnapshot triggers on changes,PASS
+TC-API-009,API Integration,Firestore,Compound query,Index exists,1. Query with multiple conditions,"isPublished=true, date>=today",Results returned,Filtered results correct,PASS
+TC-API-010,API Integration,Cloudinary,File upload,Valid file,1. Upload PDF,5MB PDF file,File uploaded,URL returned,PASS
+TC-API-011,API Integration,Cloudinary,Download URL,File exists,1. Get download URL,PDF public ID,Raw URL generated,/raw/upload/ URL for PDF download,PASS
+TC-API-012,API Integration,Cloudinary,Invalid file type,Unsupported file,1. Try upload .exe,-,Error returned,Upload rejected,PASS
+TC-OPT-001,Firebase Optimization,Caching,Dashboard stats cached,First load completed,"1. Navigate away 2. Return to dashboard",-,Stats loaded from cache no Firebase read,Cache hit instant load,PASS
+TC-OPT-002,Firebase Optimization,Caching,Cache TTL expiry,Cache older than 5 min,"1. Wait 5+ minutes 2. Refresh",-,Fresh data fetched,Cache invalidated new data loaded,PASS
+TC-OPT-003,Firebase Optimization,Query Limit,Limited query results,On materials page,1. Load materials,-,Only 20 items loaded,Query uses limit(20),PASS
+TC-OPT-004,Firebase Optimization,Index Usage,Compound query with index,Index created,1. Query events by isPublished+date,-,Fast response <500ms,Index used no full scan,PASS
+TC-OPT-005,Firebase Optimization,Debounce,Stat increment debounce,Rapid actions,1. Like/unlike rapidly,-,Single write after 2s,Writes batched reduced operations,PASS
+TC-ERR-001,Error Handling,Network,Offline handling,Internet connected,"1. Disconnect internet 2. Try action",-,Graceful error message,Toast: Network error Please check connection,PASS
+TC-ERR-002,Error Handling,API,API timeout,Slow network,1. Generate quiz on slow connection,-,Timeout after 30s,Error shown with retry option,PASS
+TC-ERR-003,Error Handling,Firebase,Permission denied,Invalid rules,1. Try unauthorized action,-,Permission error,Toast: Permission denied,PASS
+TC-ERR-004,Error Handling,Validation,Invalid JSON from AI,Malformed response,1. AI returns bad JSON,-,Parsing handled,Error caught user notified,PASS
