@@ -14,6 +14,10 @@ export async function generateQuizAI(
   count: number,
   difficulty: 'Easy' | 'Medium' | 'Hard'
 ): Promise<Question[]> {
+  if (!GROQ_API_KEY) {
+    throw new Error('GROQ API key is not configured. Please set NEXT_PUBLIC_GROQ_API_KEY in your .env.local file.');
+  }
+
   const prompt = `Generate ${count} multiple-choice questions about "${topic}" at ${difficulty} difficulty level.
   
 Return ONLY a valid JSON array with this exact structure for each question:
@@ -47,10 +51,21 @@ Important:
     }),
   });
 
-  if (!res.ok) throw new Error('Groq API Error: ' + (await res.text()));
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error('Groq API Error Response:', res.status, errorText);
+    throw new Error(`Groq API Error (${res.status}): ${errorText}`);
+  }
 
   const json = await res.json();
+  
+  if (!json.choices || !json.choices[0] || !json.choices[0].message) {
+    console.error('Invalid Groq API response:', json);
+    throw new Error('Invalid response from Groq API');
+  }
+  
   const raw = json.choices[0].message.content;
+  console.log('Raw Groq response:', raw);
   const jsonStr = raw.replace(/```json|```/g, '').trim();
 
   // robust extractor

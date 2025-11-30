@@ -96,16 +96,19 @@ export function AIQuiz({ user, onNavigate, onLogout, darkMode }: AIQuizProps) {
       return;
     }
     try {
-      const generated = await generateQuizAI(quizTopic, parseInt(questionCount), difficulty as any);
+      console.log('Generating quiz with topic:', quizTopic, 'count:', questionCount, 'difficulty:', difficulty);
+      const generated = await generateQuizAI(quizTopic, parseInt(questionCount), difficulty as 'Easy' | 'Medium' | 'Hard');
+      console.log('Generated questions:', generated);
       setQuestions(generated);
       setAnswers(new Array(generated.length).fill(null));
       setQuizStartTime(Date.now());
       setScoreSaved(false);
       setMode('quiz');
       toast.success('AI quiz generated!');
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to generate quiz. Try again.');
+    } catch (err: unknown) {
+      console.error('Quiz generation error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      toast.error(`Failed to generate quiz: ${errorMessage}`);
     }
   };
 
