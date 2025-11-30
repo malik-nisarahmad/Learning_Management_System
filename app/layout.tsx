@@ -8,8 +8,8 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className="dark">
-      <body className="min-h-screen bg-[#030712] text-white antialiased selection:bg-indigo-500/30 selection:text-indigo-200">
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body className="min-h-screen bg-[#030712] text-white antialiased selection:bg-indigo-500/30 selection:text-indigo-200" suppressHydrationWarning>
         {/* Background Effects */}
         <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
           {/* Grid Pattern */}

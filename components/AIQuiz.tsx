@@ -18,10 +18,12 @@ import {
   Lightbulb,
   RotateCcw,
   Sparkles,
-  TrendingUp
+  TrendingUp,
+  Loader2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { generateQuizAI } from '@/lib/aiQuizGenerator';
+import { saveQuizAttempt, subscribeToUserQuizAttempts, QuizAttempt } from '@/lib/userStatsSystem';
 import type { Screen, User } from '@/app/page';
 
 interface AIQuizProps {
@@ -48,7 +50,19 @@ export function AIQuiz({ user, onNavigate, onLogout, darkMode }: AIQuizProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [answers, setAnswers] = useState<(number | null)[]>([]);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [recentAttempts, setRecentAttempts] = useState<QuizAttempt[]>([]);
+  const [quizStartTime, setQuizStartTime] = useState<number>(0);
+  const [scoreSaved, setScoreSaved] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(1800);
+
+  // Subscribe to user's recent quiz attempts
+  useEffect(() => {
+    const unsubscribe = subscribeToUserQuizAttempts(user.id, (attempts) => {
+      setRecentAttempts(attempts);
+    }, 5);
+
+    return () => unsubscribe();
+  }, [user.id]);
 
   const mockQuestions: Question[] = [
     {
@@ -85,6 +99,8 @@ export function AIQuiz({ user, onNavigate, onLogout, darkMode }: AIQuizProps) {
       const generated = await generateQuizAI(quizTopic, parseInt(questionCount), difficulty as any);
       setQuestions(generated);
       setAnswers(new Array(generated.length).fill(null));
+      setQuizStartTime(Date.now());
+      setScoreSaved(false);
       setMode('quiz');
       toast.success('AI quiz generated!');
     } catch (err) {
@@ -115,8 +131,31 @@ export function AIQuiz({ user, onNavigate, onLogout, darkMode }: AIQuizProps) {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setMode('results');
+    
+    // Save quiz score to Firebase
+    if (!scoreSaved && questions.length > 0) {
+      const score = calculateScore();
+      const timeSpent = Math.round((Date.now() - quizStartTime) / 1000);
+      
+      try {
+        await saveQuizAttempt({
+          userId: user.id,
+          userName: user.name,
+          topic: quizTopic,
+          difficulty: difficulty.toLowerCase() as 'easy' | 'medium' | 'hard',
+          score: Math.round(score.percentage),
+          totalQuestions: score.total,
+          correctAnswers: score.correct,
+          timeSpent,
+        });
+        setScoreSaved(true);
+        toast.success('Quiz score saved!');
+      } catch (error) {
+        console.error('Failed to save quiz score:', error);
+      }
+    }
   };
 
   const calculateScore = () => {
@@ -137,6 +176,17 @@ export function AIQuiz({ user, onNavigate, onLogout, darkMode }: AIQuizProps) {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const getTimeAgo = (date: Date) => {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) return 'Just now';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} min ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
+    return `${Math.floor(diffInSeconds / 604800)} weeks ago`;
   };
 
   const currentQuestion = questions[currentQuestionIndex];
@@ -199,22 +249,35 @@ export function AIQuiz({ user, onNavigate, onLogout, darkMode }: AIQuizProps) {
                 Recent Quiz Scores
               </h3>
               <div className="space-y-3">
-                {[
-                  { topic: 'Data Structures', score: 85, date: '2 days ago' },
-                  { topic: 'Algorithms', score: 92, date: '5 days ago' },
-                  { topic: 'Database Systems', score: 78, date: '1 week ago' }
-                ].map((quiz, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 bg-slate-950/30 border border-slate-800/50 rounded-xl hover:border-indigo-500/30 transition-colors group">
-                    <div>
-                      <p className="text-white font-medium group-hover:text-indigo-400 transition-colors">{quiz.topic}</p>
-                      <p className="text-slate-500 text-xs mt-1">{quiz.date}</p>
-                    </div>
-                    <div className="flex items-center gap-2 bg-slate-900/50 px-3 py-1.5 rounded-lg border border-slate-800">
-                      <Award className="w-4 h-4 text-yellow-400" />
-                      <span className="text-white font-bold">{quiz.score}%</span>
-                    </div>
+                {recentAttempts.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Brain className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+                    <p className="text-slate-400 text-sm">No quizzes taken yet</p>
+                    <p className="text-slate-500 text-xs mt-1">Generate a quiz to get started!</p>
                   </div>
-                ))}
+                ) : (
+                  recentAttempts.map((quiz) => {
+                    const date = quiz.completedAt instanceof Date 
+                      ? quiz.completedAt 
+                      : quiz.completedAt?.toDate?.() || new Date();
+                    const timeAgo = getTimeAgo(date);
+                    
+                    return (
+                      <div key={quiz.id} className="flex items-center justify-between p-4 bg-slate-950/30 border border-slate-800/50 rounded-xl hover:border-indigo-500/30 transition-colors group">
+                        <div>
+                          <p className="text-white font-medium group-hover:text-indigo-400 transition-colors">{quiz.topic}</p>
+                          <p className="text-slate-500 text-xs mt-1">
+                            {quiz.difficulty} · {quiz.correctAnswers}/{quiz.totalQuestions} correct · {timeAgo}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 bg-slate-900/50 px-3 py-1.5 rounded-lg border border-slate-800">
+                          <Award className={`w-4 h-4 ${quiz.score >= 70 ? 'text-yellow-400' : 'text-slate-400'}`} />
+                          <span className="text-white font-bold">{quiz.score}%</span>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </div>
           </>

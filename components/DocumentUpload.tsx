@@ -151,8 +151,8 @@ export function DocumentUpload({
         }
       });
 
-      // Upload directly to Cloudinary
-      xhr.open('POST', `https://api.cloudinary.com/v1_1/${cloudName}/upload`);
+      // Upload directly to Cloudinary - use /auto/upload to handle all file types properly
+      xhr.open('POST', `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`);
       xhr.send(formData);
 
     } catch (err: any) {
