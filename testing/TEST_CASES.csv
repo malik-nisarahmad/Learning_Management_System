@@ -1,64 +1,77 @@
-Test ID,Feature/Module,Test Description,Input,Expected Output,Actual Output,Status
-TC-AUTH-001,Registration,Register with valid data,"Name: John Doe, Email: john@example.com, Password: Test@123",Account created success message displayed,Account created successfully,PASS
-TC-AUTH-002,Registration,Register with invalid email,"Name: John, Email: invalid-email, Password: Test@123",Error: Invalid email format,Shows validation error,PASS
-TC-AUTH-003,Registration,Register with short password,"Name: John, Email: john@test.com, Password: 123",Error: Password too short,Shows password requirement error,PASS
-TC-AUTH-004,Registration,Register with existing email,Email: existing@example.com,Error: Email already registered,Shows duplicate email error,PASS
-TC-AUTH-005,Login,Login with valid credentials,"Email: john@example.com, Password: Test@123",Redirect to Dashboard,Successfully logged in,PASS
-TC-AUTH-006,Login,Login with wrong password,"Email: john@example.com, Password: wrong",Error: Invalid credentials,Shows authentication error,PASS
-TC-AUTH-007,Login,Login with non-existent email,Email: nouser@test.com,Error: User not found,Shows user not found error,PASS
-TC-AUTH-008,Logout,Click logout button,User logged in,"Session ended, redirect to landing",Successfully logged out,PASS
-TC-AUTH-009,Session,Access dashboard without login,Direct URL to /dashboard,Redirect to login page,Redirected to login,PASS
-TC-AUTH-010,Session,Session persistence on refresh,Logged in user refreshes,User remains logged in,Session maintained,PASS
-TC-DASH-001,Dashboard,View dashboard after login,Valid login,Dashboard with stats displayed,Dashboard loads correctly,PASS
-TC-DASH-002,Navigation,Click all nav items,Each nav button,Correct page loads,All navigation works,PASS
-TC-DASH-003,User Info,Display user name,Logged in user,User name shown in header,Name displayed correctly,PASS
-TC-DASH-004,Quick Actions,Click quick action buttons,Click each button,Navigate to respective module,Actions work correctly,PASS
-TC-MAT-001,Study Materials,Upload PDF document,Valid PDF file,"File uploaded, appears in list",Upload successful,PASS
-TC-MAT-002,Study Materials,Upload image file,JPG/PNG image,Image uploaded successfully,Upload successful,PASS
-TC-MAT-003,Study Materials,Upload invalid file type,.exe file,Error: Invalid file type,Shows file type error,PASS
-TC-MAT-004,Study Materials,Upload without file selected,Click upload with no file,Error: Please select a file,Shows selection error,PASS
-TC-MAT-005,Study Materials,View uploaded materials,Click on material,Document viewer opens,Document displayed,PASS
-TC-MAT-006,Study Materials,Download material,Click download button,File downloads,Download started,PASS
-TC-MAT-007,Study Materials,Delete own material,Click delete on own file,Material removed from list,Deletion successful,PASS
-TC-MAT-008,Study Materials,Filter by subject,Select subject filter,Only relevant materials shown,Filter works correctly,PASS
-TC-QUIZ-001,AI Quiz,Generate quiz for subject,"Subject: Mathematics, Count: 5",5 questions generated,Quiz generated successfully,PASS
-TC-QUIZ-002,AI Quiz,Generate quiz without subject,No subject selected,Error: Select a subject,Shows selection error,PASS
-TC-QUIZ-003,AI Quiz,Submit correct answers,All correct answers,Score: 100%,Score calculated correctly,PASS
-TC-QUIZ-004,AI Quiz,Submit partial answers,3 out of 5 correct,Score: 60%,Score calculated correctly,PASS
-TC-QUIZ-005,AI Quiz,Submit without answering,No answers selected,Error: Answer all questions,Shows completion error,PASS
-TC-QUIZ-006,AI Quiz,View quiz results,Complete quiz,Show correct/incorrect answers,Results displayed,PASS
-TC-QUIZ-007,AI Quiz,Retry quiz,Click retry button,New quiz generated,Quiz reset successfully,PASS
-TC-DISC-001,Discussion Forum,Create discussion post,"Title: Help, Content: Question...",Post appears in feed,Post created successfully,PASS
-TC-DISC-002,Discussion Forum,Create post without title,"Empty title, valid content",Error: Title required,Shows validation error,PASS
-TC-DISC-003,Discussion Forum,Create post without content,"Valid title, empty content",Error: Content required,Shows validation error,PASS
-TC-DISC-004,Discussion Forum,View discussion feed,Navigate to discussions,All posts displayed,Posts load correctly,PASS
-TC-DISC-005,Discussion Forum,Add comment to post,Comment text on post,Comment appears under post,Comment added,PASS
-TC-DISC-006,Discussion Forum,Add empty comment,Empty comment text,Error: Comment required,Shows validation error,PASS
-TC-DISC-007,Discussion Forum,Reply to comment,Reply text,Reply appears nested,Reply added correctly,PASS
-TC-DISC-008,Discussion Forum,Upvote a post,Click upvote,Vote count increases,Vote registered,PASS
-TC-DISC-009,Discussion Forum,Downvote a post,Click downvote,Vote count decreases,Vote registered,PASS
-TC-DISC-010,Discussion Forum,Delete own post,Click delete on own post,Post removed from feed,Post deleted,PASS
-TC-DISC-011,Discussion Forum,Delete other's post,Try delete other's post,No delete option shown,Delete hidden correctly,PASS
-TC-DISC-012,Discussion Forum,Sort by newest,Select Newest sort,Posts sorted by date desc,Sorting works,PASS
-TC-DISC-013,Discussion Forum,Sort by most votes,Select Top sort,Posts sorted by votes,Sorting works,PASS
-TC-DISC-014,Discussion Forum,Filter by tag,Select tag filter,Only tagged posts shown,Filter works,PASS
-TC-CHAT-001,Chat,Send direct message,Message: Hello,Message appears in chat,Message sent,PASS
-TC-CHAT-002,Chat,Send empty message,Empty message,Send button disabled,Cannot send empty,PASS
-TC-CHAT-003,Chat,Receive message,Other user sends,Message appears in real-time,Real-time works,PASS
-TC-CHAT-004,Chat,Create chat group,"Group name, members",Group created,Group created,PASS
-TC-CHAT-005,Chat,Send to group,Message in group,All members receive,Group message works,PASS
-TC-CHAT-006,Chat,Send friend request,Click add friend,Request sent notification,Request sent,PASS
-TC-CHAT-007,Chat,Accept friend request,Click accept,Friend added to list,Friend added,PASS
-TC-CHAT-008,Chat,View online users,Check status,Green dot for online,Status displayed,PASS
-TC-FAC-001,Faculty Contact,View faculty list,Navigate to faculty,Faculty list displayed,List loads correctly,PASS
-TC-FAC-002,Faculty Contact,Generate AI email,Purpose: Extension request,Email draft generated,AI generates email,PASS
-TC-FAC-003,Faculty Contact,Send composed email,"Valid subject, body",Email sent confirmation,Email sent successfully,PASS
-TC-FAC-004,Faculty Contact,Send without subject,Empty subject,Error: Subject required,Shows validation error,PASS
-TC-FAC-005,Faculty Contact,View faculty details,Click faculty card,Contact info displayed,Details shown,PASS
-TC-PROF-001,Profile,View own profile,Navigate to profile,Profile info displayed,Profile loads,PASS
-TC-PROF-002,Profile,Change display name,New name: John Smith,Name updated everywhere,Name updated,PASS
-TC-PROF-003,Profile,Upload profile picture,Valid image file,Avatar updated,Avatar changed,PASS
-TC-PROF-004,Profile,Upload invalid file,Non-image file,Error: Invalid image,Shows error,PASS
-TC-EVT-001,Events,View upcoming events,Navigate to events,Events list displayed,Events load,PASS
-TC-EVT-002,Events,Click on event,Click event card,Event details shown,Details displayed,PASS
-TC-EVT-003,Events,View calendar,Open calendar view,Events on calendar,Calendar works,PASS
+Test ID,Module,Feature,Test Description,Precondition,Test Steps,Test Data,Expected Result,Actual Result,Status
+TC-AUTH-001,Authentication,Registration,Valid user registration,App loaded on landing page,"1. Click Get Started 2. Click Register 3. Fill form 4. Submit","Name: Test User, Email: test@example.com, Password: Test@123",Success message redirect to dashboard,Account created email verification sent,PASS
+TC-AUTH-002,Authentication,Registration,Empty name field,On registration page,"1. Leave name empty 2. Fill other fields 3. Submit","Name: empty, Email: test@test.com, Password: Test@123",Validation error for name,Form shows Name is required,PASS
+TC-AUTH-003,Authentication,Registration,Invalid email format,On registration page,"1. Enter invalid email 2. Submit",Email: notanemail,Error: Invalid email format,Firebase returns Invalid email address,PASS
+TC-AUTH-004,Authentication,Registration,Password too short,On registration page,"1. Enter short password 2. Submit",Password: 123,Error: Password must be 6+ characters,Shows Password must be at least 6 characters,PASS
+TC-AUTH-005,Authentication,Registration,Password mismatch,On registration page,"1. Enter different passwords 2. Submit","Password: Test@123, Confirm: Test@456",Error: Passwords dont match,Shows Passwords do not match,PASS
+TC-AUTH-006,Authentication,Registration,Duplicate email,On registration page,"1. Use existing email 2. Submit",Email: existing@test.com,Error: Email already in use,Shows An account with this email already exists,PASS
+TC-AUTH-007,Authentication,Login,Valid credentials,User registered,"1. Click Login 2. Enter credentials 3. Submit","Email: test@example.com, Password: Test@123",Redirect to Dashboard,Successfully logged in dashboard displayed,PASS
+TC-AUTH-008,Authentication,Login,Wrong password,User registered,"1. Enter wrong password 2. Submit","Email: test@example.com, Password: wrongpass",Error: Incorrect password,Shows Incorrect password,PASS
+TC-AUTH-009,Authentication,Login,Non-existent email,On login page,"1. Enter unregistered email 2. Submit",Email: nouser@test.com,Error: User not found,Shows No account found with this email,PASS
+TC-AUTH-010,Authentication,Logout,User logout,User logged in,"1. Click avatar 2. Click Logout",-,Session ended redirect to landing,Logged out successfully localStorage cleared,PASS
+TC-AUTH-011,Authentication,Session,Persistence on refresh,User logged in,1. Refresh browser (F5),-,User remains logged in,Session persisted via Firebase onAuthStateChanged,PASS
+TC-AUTH-012,Authentication,Password Reset,Send reset email,On login page,"1. Click Forgot password 2. Enter email 3. Submit",Email: test@example.com,Success: Reset email sent,Shows Password reset link has been sent,PASS
+TC-DASH-001,Dashboard,Load,Dashboard loads correctly,User logged in,1. Complete login,-,Dashboard with user info displayed,Dashboard rendered with stats cards,PASS
+TC-DASH-002,Dashboard,User Info,Display user name,On dashboard,1. Check header,-,User name and avatar shown,Name from Firebase displayed in header,PASS
+TC-DASH-003,Dashboard,Navigation,Sidebar navigation,On dashboard,1. Click each nav item,-,Respective page loads,All nav items route correctly,PASS
+TC-DASH-004,Dashboard,Quick Actions,Action buttons,On dashboard,1. Click quick action buttons,-,Navigate to target module,All quick actions functional,PASS
+TC-DASH-005,Dashboard,Stats,Statistics display,On dashboard,1. View stats cards,-,Course stats displayed,Stats cards show correct data,PASS
+TC-MAT-001,Study Materials,Upload,Upload PDF file,On Study Materials,"1. Click Upload 2. Select PDF 3. Fill details 4. Submit","File: sample.pdf, Title: Test PDF",File uploaded to Cloudinary,Upload successful file appears in list,PASS
+TC-MAT-002,Study Materials,Upload,Upload image file,On Study Materials,1. Upload image file,File: image.jpg,Image uploaded successfully,Upload successful with preview,PASS
+TC-MAT-003,Study Materials,Upload,Empty title,On upload dialog,"1. Skip title 2. Submit",Title: empty,Validation error,Shows Please fill in all required fields,PASS
+TC-MAT-004,Study Materials,Upload,No file selected,On upload dialog,1. Click upload without file,-,Error message,Shows file selection error,PASS
+TC-MAT-005,Study Materials,View,View material list,On Study Materials,1. Navigate to module,-,List of materials displayed,Materials loaded from state,PASS
+TC-MAT-006,Study Materials,View,Open document,On materials list,1. Click on material card,-,Document viewer opens,Document displayed in viewer,PASS
+TC-MAT-007,Study Materials,Download,Download file,On material card,1. Click download button,-,File download starts,Download initiated via Cloudinary URL,PASS
+TC-MAT-008,Study Materials,Delete,Delete own material,Own material in list,"1. Click delete 2. Confirm",-,Material removed,Material deleted from list,PASS
+TC-MAT-009,Study Materials,Filter,Filter by course,On materials list,1. Select course filter,Course: Data Structures,Filtered results shown,Only matching materials displayed,PASS
+TC-MAT-010,Study Materials,Search,Search materials,On materials list,1. Type in search box,Query: algorithm,Matching results shown,Search filter applied correctly,PASS
+TC-QUIZ-001,AI Quiz,Generate,Generate AI quiz,On Quiz page,"1. Enter topic 2. Set count 3. Click Generate","Topic: Data Structures, Count: 5",5 questions generated by Groq AI,Quiz generated with 5 questions,PASS
+TC-QUIZ-002,AI Quiz,Generate,Empty topic,On Quiz page,"1. Leave topic empty 2. Click Generate",Topic: empty,Error: Enter a topic,Toast shows Please enter a topic,PASS
+TC-QUIZ-003,AI Quiz,Generate,AI API error handling,On Quiz page,1. Generate with invalid API,-,Fallback to mock questions,Graceful error handling with fallback,PASS
+TC-QUIZ-004,AI Quiz,Answer,Select answer,Quiz in progress,1. Click answer option,-,Answer highlighted,Selected answer styled differently,PASS
+TC-QUIZ-005,AI Quiz,Answer,Navigate questions,Quiz in progress,1. Click Next/Previous,-,Navigate between questions,Navigation works correctly,PASS
+TC-QUIZ-006,AI Quiz,Submit,Submit all answers,All questions answered,"1. Answer all 2. Submit",All 5 answered,Score calculated,Score displayed with percentage,PASS
+TC-QUIZ-007,AI Quiz,Score,100% score,All correct,"1. Answer all correctly 2. Submit",All correct answers,Score: 100%,Shows 100% - Excellent!,PASS
+TC-QUIZ-008,AI Quiz,Review,View explanations,Quiz completed,"1. Complete quiz 2. View results",-,Show correct answers and explanations,Explanations displayed for each question,PASS
+TC-QUIZ-009,AI Quiz,Retry,Restart quiz,Quiz completed,1. Click Try Again,-,New quiz generated,Quiz reset new questions loaded,PASS
+TC-DISC-001,Discussion Forum,Create Post,Create discussion post,On Discussion Feed,"1. Click + 2. Fill form 3. Submit","Title: Help needed, Content: Question about OOP, Category: Discussion",Post created in Firebase,Post appears in feed with correct data,PASS
+TC-DISC-002,Discussion Forum,Create Post,Create question post,On Discussion Feed,"1. Select Question type 2. Submit","Category: Question, Tags: [oop help]",Question post with amber badge,Question badge displayed correctly,PASS
+TC-DISC-003,Discussion Forum,Create Post,Create announcement,On Discussion Feed,"1. Select Announcement 2. Submit",Category: Announcement,Announcement with rose badge,Announcement styled correctly,PASS
+TC-DISC-004,Discussion Forum,Create Post,Empty title validation,On create dialog,"1. Leave title empty 2. Submit",Title: empty,Error shown,Toast: Title is required,PASS
+TC-DISC-005,Discussion Forum,Create Post,Empty content validation,On create dialog,"1. Leave content empty 2. Submit",Content: empty,Error shown,Toast: Content is required,PASS
+TC-DISC-006,Discussion Forum,View Posts,Load posts,On Discussion Feed,1. Navigate to discussions,-,Posts loaded from Firebase,Real-time posts displayed,PASS
+TC-DISC-007,Discussion Forum,Comment,Add comment,Post expanded,"1. Type comment 2. Click Send",Comment: Great question!,Comment added to post,Comment appears with author info,PASS
+TC-DISC-008,Discussion Forum,Comment,Empty comment validation,Comment input focused,1. Click Send without text,Comment: empty,Error shown,Send button disabled/error,PASS
+TC-DISC-009,Discussion Forum,Reply,Reply to comment,Comment visible,"1. Click Reply 2. Type 3. Submit",Reply: Thanks for asking,Nested reply appears,Reply indented under parent comment,PASS
+TC-DISC-010,Discussion Forum,Reply,Threaded replies,Multiple replies,1. Reply to reply,-,Reddit-style threading,Colored thread lines displayed,PASS
+TC-DISC-011,Discussion Forum,Upvote,Upvote post,Post visible,1. Click upvote button,-,Vote count +1,Vote count increases button highlighted,PASS
+TC-DISC-012,Discussion Forum,Downvote,Downvote post,Post visible,1. Click downvote button,-,Vote count -1,Vote count decreases,PASS
+TC-DISC-013,Discussion Forum,Delete,Delete own post,Own post visible,"1. Click menu 2. Delete 3. Confirm",-,Post removed,Post deleted from Firebase and UI,PASS
+TC-DISC-014,Discussion Forum,Delete,Cannot delete others,Others post,1. Check for delete option,-,No delete option,Delete option hidden for non-owners,PASS
+TC-DISC-015,Discussion Forum,Sort,Sort by Hot,On Discussion Feed,1. Click Hot sort,-,Posts sorted by engagement,Posts reordered correctly,PASS
+TC-DISC-016,Discussion Forum,Sort,Sort by New,On Discussion Feed,1. Click New sort,-,Posts sorted by date (newest),Most recent posts first,PASS
+TC-CHAT-001,Chat,Send DM,Send direct message,Chat open,"1. Select user 2. Type 3. Send",Message: Hello!,Message sent and displayed,Message appears in conversation,PASS
+TC-CHAT-002,Chat,Send DM,Empty message,Chat open,1. Click send without text,Message: empty,Send disabled,Send button disabled when empty,PASS
+TC-CHAT-003,Chat,Receive,Receive message,Chat open,1. Other user sends message,-,Real-time update,Message appears instantly via Firebase,PASS
+TC-CHAT-004,Chat,Group,Create group,On chat,"1. Click Create Group 2. Add members 3. Create",Name: Study Group,Group created,Group appears in sidebar,PASS
+TC-CHAT-005,Chat,Group,Send group message,In group chat,"1. Type message 2. Send",-,All members receive,Message visible to all group members,PASS
+TC-CHAT-006,Chat,Friends,Send friend request,User selected,1. Click Add Friend,-,Request sent,Toast: Friend request sent,PASS
+TC-CHAT-007,Chat,Friends,Accept friend request,Request received,1. Click Accept,-,Friend added,User appears in friends list,PASS
+TC-CHAT-008,Chat,Friends,Decline friend request,Request received,1. Click Decline,-,Request removed,Request removed from pending,PASS
+TC-CHAT-009,Chat,Status,Online indicator,Friends list,1. Check friend status,-,Green dot for online,Online users show green indicator,PASS
+TC-CHAT-010,Chat,Search,Search users,On chat,1. Type in search,Query: John,Matching users shown,Search results filtered,PASS
+TC-FAC-001,Faculty Contact,View,Load faculty list,On Faculty Contact,1. Navigate to module,-,24 faculty members displayed,Faculty list rendered correctly,PASS
+TC-FAC-002,Faculty Contact,Filter,Filter by department,On Faculty Contact,1. Select department,Dept: Computer Science,Filtered results,Only CS faculty shown,PASS
+TC-FAC-003,Faculty Contact,Search,Search faculty,On Faculty Contact,1. Type in search,Query: Dr. Hasan,Matching faculty shown,Search results correct,PASS
+TC-FAC-004,Faculty Contact,AI Email,Generate AI email,Email dialog open,"1. Select purpose 2. Generate",Purpose: Assignment extension,AI generates professional email,Email draft generated by Groq API,PASS
+TC-FAC-005,Faculty Contact,Copy,Copy email,Email generated,1. Click Copy,-,Email copied to clipboard,Toast: Email copied to clipboard,PASS
+TC-FAC-006,Faculty Contact,Send,Send email,Email composed,1. Click Send,-,Success confirmation,Toast: Email sent successfully,PASS
+TC-PROF-001,Profile,View,View profile,On Profile page,1. Navigate to Profile,-,Profile info displayed,User data rendered,PASS
+TC-PROF-002,Profile,Edit,Enable edit mode,On Profile page,1. Click Edit Profile,-,Fields become editable,Input fields enabled,PASS
+TC-PROF-003,Profile,Update,Update name,Edit mode active,"1. Change name 2. Save",Name: John Smith,Name updated,Toast: Profile updated successfully,PASS
+TC-PROF-004,Profile,Update,Update email,Edit mode active,"1. Change email 2. Save",Email: new@test.com,Email updated,Profile reflects new email,PASS
+TC-PROF-005,Profile,Avatar,View avatar,On Profile page,1. Check avatar,-,Avatar displayed,Avatar shows initials or image,PASS
+TC-EVT-001,Events,View,View events list,On Events page,1. Navigate to Events,-,Events displayed,Event cards rendered,PASS
+TC-EVT-002,Events,Details,View event details,Event visible,1. Click event card,-,Details shown,Event info displayed,PASS
+TC-EVT-003,Events,Calendar,Calendar view,On Events page,1. Check calendar,-,Calendar with events,Calendar component functional,PASS
